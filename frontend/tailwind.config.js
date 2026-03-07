@@ -9,14 +9,10 @@ export default {
           800: '#0d1427',
           700: '#111b38',
         },
-        teal: {
-          400: '#2dd4bf',
-          500: '#14b8a6',
-        },
       },
       fontFamily: {
-        display: ['"DM Serif Display"', 'serif'],
-        mono: ['"JetBrains Mono"', 'monospace'],
+        display: ['"DM Serif Display"', 'Georgia', 'serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
     },
   },

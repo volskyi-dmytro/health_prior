@@ -9,7 +9,6 @@ on:
 env:
   REGISTRY: docker.io
   BACKEND_IMAGE: stpunk47/healthprior-backend
-  MCP_IMAGE: stpunk47/healthprior-mcp
   FRONTEND_IMAGE: stpunk47/healthprior-frontend
 
 jobs:
@@ -85,17 +84,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Build and push MCP server
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          push: true
-          tags: |
-            ${{ env.MCP_IMAGE }}:${{ steps.meta.outputs.version }}
-            ${{ env.MCP_IMAGE }}:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
       - name: Build and push frontend
         uses: docker/build-push-action@v5
         with:
@@ -136,7 +124,6 @@ jobs:
 
             # Pull new images
             docker pull stpunk47/healthprior-backend:$IMAGE_TAG
-            docker pull stpunk47/healthprior-mcp:$IMAGE_TAG
             docker pull stpunk47/healthprior-frontend:$IMAGE_TAG
 
             # Update .env IMAGE_TAG
