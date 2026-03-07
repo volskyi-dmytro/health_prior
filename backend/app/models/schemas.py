@@ -15,35 +15,8 @@ class FHIRCode(BaseModel):
     text: str
     coding: list[FHIRCoding] = []
 
-class FHIRCondition(BaseModel):
-    resourceType: str = "Condition"
-    id: str
-    code: FHIRCode
-    clinicalStatus: str
-    evidence: list[dict] = []
-    _sourceRef: str = Field(alias="_sourceRef", default="")
-
-    model_config = {"populate_by_name": True}
-
-class FHIRMedicationRequest(BaseModel):
-    resourceType: str = "MedicationRequest"
-    id: str
-    medication: dict
-    status: str
-    dosageInstruction: list[dict] = []
-    _sourceRef: str = Field(alias="_sourceRef", default="")
-
-    model_config = {"populate_by_name": True}
-
-class FHIRObservation(BaseModel):
-    resourceType: str = "Observation"
-    id: str
-    code: FHIRCode
-    valueString: str
-    status: str
-    _sourceRef: str = Field(alias="_sourceRef", default="")
-
-    model_config = {"populate_by_name": True}
+# Note: FHIR resources use plain dicts in FHIRBundle.entry to allow _sourceRef keys.
+# These typed helpers are for documentation only — not used at runtime.
 
 class FHIRBundle(BaseModel):
     resourceType: str = "Bundle"

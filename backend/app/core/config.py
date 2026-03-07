@@ -1,8 +1,10 @@
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 from typing import List
-import os
 
 class Settings(BaseSettings):
+    model_config = ConfigDict(env_file=".env", extra="ignore")
+
     OPENROUTER_API_KEY: str = ""
     OPENAI_API_KEY: str = ""
     DEFAULT_MODEL: str = "anthropic/claude-3.5-sonnet"
@@ -15,9 +17,5 @@ class Settings(BaseSettings):
     @property
     def CORS_ORIGINS_LIST(self) -> List[str]:
         return [o.strip() for o in self.CORS_ORIGINS.split(",")]
-
-    class Config:
-        env_file = ".env"
-        extra = "ignore"
 
 settings = Settings()
