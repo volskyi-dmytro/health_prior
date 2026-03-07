@@ -162,12 +162,20 @@ async def health_check() -> dict:
     return {"status": "ok", "service": "healthprior-mcp", "tools": 5}
 
 
-# HTTP health endpoint (non-MCP) for Docker health checks
-app = mcp.http_app()
+# Wrap MCP ASGI app in FastAPI to add /health route for Docker health checks
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+from starlette.routing import Mount
+
+_mcp_asgi = mcp.http_app()
+
+app = FastAPI(title="HealthPrior MCP Server")
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "healthprior-mcp"}
+    return JSONResponse({"status": "ok", "service": "healthprior-mcp"})
+
+app.mount("/", _mcp_asgi)
 
 
 if __name__ == "__main__":
