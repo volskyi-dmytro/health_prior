@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  backend:
+    image: stpunk47/healthprior-backend:${IMAGE_TAG:-latest}
+    container_name: healthprior-backend
+    env_file: .env
+    ports:
+      - "8100:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  mcp-server:
+    image: stpunk47/healthprior-mcp:${IMAGE_TAG:-latest}
+    container_name: healthprior-mcp
+    env_file: .env
+    ports:
+      - "8001:8001"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    image: stpunk47/healthprior-frontend:${IMAGE_TAG:-latest}
+    container_name: healthprior-frontend
+    ports:
+      - "3100:80"
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: healthprior-postgres
+    env_file: .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-healthprior}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
