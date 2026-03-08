@@ -17,10 +17,10 @@ async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
 export const getSampleNotes = () =>
   fetchJSON<import('../types').SampleNote[]>(`${API_BASE}/notes/samples`);
 
-export const structureNote = (note: string, model?: string, policy_id?: string) =>
+export const structureNote = (note: string, model?: string, policy_id?: string, session_id?: string) =>
   fetchJSON<{ fhir_bundle: import('../types').FHIRBundle; raw_note: string; model_used: string }>(
     `${API_BASE}/notes/structure`,
-    { method: 'POST', body: JSON.stringify({ note, model, policy_id }) }
+    { method: 'POST', body: JSON.stringify({ note, model, policy_id, session_id }) }
   );
 
 export const getPolicies = () =>
@@ -36,21 +36,23 @@ export const getPriorAuthPdfUrl = (submission_id: string) =>
 export const evaluateCoverage = (
   fhir_bundle: import('../types').FHIRBundle,
   raw_note: string,
-  policy_id = 'MCR-621'
+  policy_id = 'MCR-621',
+  session_id?: string
 ) =>
   fetchJSON<import('../types').CoverageResult>(`${API_BASE}/coverage/evaluate`, {
     method: 'POST',
-    body: JSON.stringify({ fhir_bundle, raw_note, policy_id }),
+    body: JSON.stringify({ fhir_bundle, raw_note, policy_id, session_id }),
   });
 
 export const generatePriorAuth = (
   fhir_bundle: import('../types').FHIRBundle,
   coverage_result: import('../types').CoverageResult,
-  raw_note: string
+  raw_note: string,
+  session_id?: string
 ) =>
   fetchJSON<import('../types').PriorAuthPackage>(`${API_BASE}/prior-auth/generate`, {
     method: 'POST',
-    body: JSON.stringify({ fhir_bundle, coverage_result, raw_note }),
+    body: JSON.stringify({ fhir_bundle, coverage_result, raw_note, session_id }),
   });
 
 export const getSubmissionHistory = () =>

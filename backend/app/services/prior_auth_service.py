@@ -10,9 +10,10 @@ class PriorAuthService:
         coverage_result: CoverageResult,
         raw_note: str,
         patient_id: str | None = None,
+        submission_id: str | None = None,
     ) -> PriorAuthPackage:
         """Generate a complete prior auth package."""
-        submission_id = str(uuid.uuid4())
+        submission_id = submission_id or str(uuid.uuid4())
         timestamp = datetime.now(timezone.utc).isoformat()
 
         # Extract patient info

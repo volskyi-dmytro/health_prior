@@ -6,6 +6,7 @@ import uuid
 class NoteStructureRequest(BaseModel):
     note: str = Field(..., min_length=10, description="Raw clinical note text")
     model: Optional[str] = Field(None, description="Override default LLM model")
+    session_id: Optional[str] = Field(None, description="Client-generated session UUID, threaded across all wizard steps")
 
 class FHIRCoding(BaseModel):
     system: str
@@ -33,6 +34,7 @@ class CoverageEvaluationRequest(BaseModel):
     fhir_bundle: FHIRBundle
     raw_note: str
     policy_id: str = "MCR-621"
+    session_id: Optional[str] = Field(None, description="Client-generated session UUID")
 
 class CoverageResult(BaseModel):
     decision: str  # APPROVED, DENIED, NEEDS_MORE_INFO
@@ -47,6 +49,7 @@ class PriorAuthRequest(BaseModel):
     coverage_result: CoverageResult
     raw_note: str
     patient_id: Optional[str] = None
+    session_id: Optional[str] = Field(None, description="Client-generated session UUID")
 
 class PriorAuthPackage(BaseModel):
     submission_id: str

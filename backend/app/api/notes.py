@@ -7,7 +7,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.database import get_db
+from app.db.database import get_db, AsyncSessionLocal
 from app.models.schemas import (
     NoteStructureRequest,
     NoteStructureResponse,
@@ -54,6 +54,7 @@ async def _structure_with_model(
     mcp_context: dict | None,
     db: AsyncSession,
     event_type: str = "note_structured",
+    session_id: str | None = None,
 ) -> NoteStructureResponse:
     """Internal helper: structure a note with a given model, validate, and log."""
     llm = LLMService(model=model)
@@ -76,6 +77,7 @@ async def _structure_with_model(
         completion_tokens=meta.completion_tokens,
         latency_ms=meta.latency_ms,
         mcp_tools_called=["get_coverage_criteria"],
+        submission_id=session_id,
     )
 
     return NoteStructureResponse(
@@ -108,8 +110,8 @@ async def structure_note(
     if request.model_b:
         try:
             result_a, result_b = await asyncio.gather(
-                _structure_with_model(request.note, model_a_name, mcp_context, db, "note_structured_model_a"),
-                _structure_with_model(request.note, request.model_b, mcp_context, db, "note_structured_model_b"),
+                _structure_with_model(request.note, model_a_name, mcp_context, db, "note_structured_model_a", request.session_id),
+                _structure_with_model(request.note, request.model_b, mcp_context, db, "note_structured_model_b", request.session_id),
             )
         except Exception as e:
             raise HTTPException(status_code=422, detail=f"Model comparison failed: {str(e)}")
@@ -125,12 +127,12 @@ async def structure_note(
         }
 
     try:
-        return await _structure_with_model(request.note, model_a_name, mcp_context, db)
+        return await _structure_with_model(request.note, model_a_name, mcp_context, db, session_id=request.session_id)
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"Failed to structure note: {str(e)}")
 
 
-async def _sse_note_stream(raw_note: str, model: str, mcp_context: dict | None) -> AsyncGenerator[str, None]:
+async def _sse_note_stream(raw_note: str, model: str, mcp_context: dict | None, session_id: str | None = None) -> AsyncGenerator[str, None]:
     """
     Stream FHIR resource cards via SSE as the LLM produces them.
 
@@ -141,10 +143,23 @@ async def _sse_note_stream(raw_note: str, model: str, mcp_context: dict | None) 
 
     llm = LLMService(model=model)
     try:
-        bundle_dict, _meta = await llm.structure_note_retry(raw_note, mcp_context)
+        bundle_dict, meta = await llm.structure_note_retry(raw_note, mcp_context)
     except Exception as e:
         yield f"event: error\ndata: {json.dumps({'detail': str(e)})}\n\n"
         return
+
+    # Audit log using a fresh session (SSE generator outlives the request session)
+    async with AsyncSessionLocal() as db:
+        await log_llm_call(
+            db=db,
+            event_type="note_structured",
+            model_used=model,
+            prompt_tokens=meta.prompt_tokens,
+            completion_tokens=meta.completion_tokens,
+            latency_ms=meta.latency_ms,
+            mcp_tools_called=["get_coverage_criteria"],
+            submission_id=session_id,
+        )
 
     # Emit patient demographics
     demographics = bundle_dict.get("patient_demographics", {})
@@ -156,7 +171,7 @@ async def _sse_note_stream(raw_note: str, model: str, mcp_context: dict | None) 
         yield f"event: resource\ndata: {json.dumps(entry)}\n\n"
         await asyncio.sleep(0)  # yield control to event loop between emissions
 
-    # Emit complete bundle as final event
+    # Emit complete bundle as final event (frontend listens for "complete")
     yield f"event: complete\ndata: {json.dumps(bundle_dict)}\n\n"
 
 
@@ -180,7 +195,7 @@ async def structure_note_stream(
     model = request.model or settings.DEFAULT_MODEL
 
     return StreamingResponse(
-        _sse_note_stream(request.note, model, mcp_context),
+        _sse_note_stream(request.note, model, mcp_context, request.session_id),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",

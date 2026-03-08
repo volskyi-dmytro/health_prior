@@ -39,6 +39,7 @@ async def evaluate_coverage(
         completion_tokens=meta.completion_tokens if meta else None,
         latency_ms=meta.latency_ms if meta else None,
         mcp_tools_called=["get_coverage_criteria"],
+        submission_id=request.session_id,
     )
 
     return result

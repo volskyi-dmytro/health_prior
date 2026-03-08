@@ -35,6 +35,7 @@ function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
 }
 
 function WizardApp() {
+  const [sessionId] = useState<string>(() => crypto.randomUUID());
   const [step, setStep] = useState<WizardStep>(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,8 +61,8 @@ function WizardApp() {
         setModelALabel(model.split('/')[1] || model);
         setModelBLabel(modelB.split('/')[1] || modelB);
         const [resultA, resultB] = await Promise.all([
-          structureNote(note, model, policyId),
-          structureNote(note, modelB, policyId),
+          structureNote(note, model, policyId, sessionId),
+          structureNote(note, modelB, policyId, sessionId),
         ]);
         setFhirBundle(resultA.fhir_bundle);
         setFhirBundleB(resultB.fhir_bundle);
@@ -78,10 +79,11 @@ function WizardApp() {
           const resources: import('./types').FHIRResource[] = [];
           let finalBundle: FHIRBundle | null = null;
 
+          let streamedDemographics: FHIRBundle['patient_demographics'] = {};
           await fetchEventSource(`${API_BASE}/notes/structure/stream`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ note, model, policy_id: policyId }),
+            body: JSON.stringify({ note, model, policy_id: policyId, session_id: sessionId }),
             onmessage(ev) {
               if (ev.event === 'resource') {
                 try {
@@ -89,7 +91,9 @@ function WizardApp() {
                   resources.push(resource);
                   setStreamedResources([...resources]);
                 } catch { /* ignore parse error */ }
-              } else if (ev.event === 'done') {
+              } else if (ev.event === 'demographics') {
+                try { streamedDemographics = JSON.parse(ev.data); } catch { /* ignore */ }
+              } else if (ev.event === 'complete') {
                 try {
                   finalBundle = JSON.parse(ev.data);
                 } catch { /* ignore */ }
@@ -110,7 +114,7 @@ function WizardApp() {
               resourceType: 'Bundle',
               type: 'collection',
               entry: resources,
-              patient_demographics: {},
+              patient_demographics: streamedDemographics,
             };
             setFhirBundle(bundle);
             streamWorked = true;
@@ -120,7 +124,7 @@ function WizardApp() {
         }
 
         if (!streamWorked) {
-          const result = await structureNote(note, model, policyId);
+          const result = await structureNote(note, model, policyId, sessionId);
           setFhirBundle(result.fhir_bundle);
         }
 
@@ -140,7 +144,7 @@ function WizardApp() {
     setLoading(true);
     setError(null);
     try {
-      const result = await evaluateCoverage(fhirBundle, rawNote);
+      const result = await evaluateCoverage(fhirBundle, rawNote, 'MCR-621', sessionId);
       setCoverageResult(result);
       setStep(3);
     } catch (e) {
@@ -156,7 +160,7 @@ function WizardApp() {
     setLoading(true);
     setError(null);
     try {
-      const result = await generatePriorAuth(fhirBundle, coverageResult, rawNote);
+      const result = await generatePriorAuth(fhirBundle, coverageResult, rawNote, sessionId);
       setPriorAuth(result);
       setStep(4);
     } catch (e) {

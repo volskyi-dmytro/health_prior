@@ -33,6 +33,7 @@ async def generate_prior_auth(request: PriorAuthRequest, db: AsyncSession = Depe
             coverage_result=request.coverage_result,
             raw_note=request.raw_note,
             patient_id=request.patient_id,
+            submission_id=request.session_id,
         )
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"Prior auth generation failed: {str(e)}")
