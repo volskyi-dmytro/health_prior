@@ -105,17 +105,9 @@ export default function App() {
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#FC5D36' }} />
-              <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#363636' }}>MCP Connected</span>
-            </div>
-            <button
-              className="btn-primary"
-              style={{ paddingLeft: '20px', paddingRight: '20px', paddingTop: '8px', paddingBottom: '8px' }}
-            >
-              Book a Demo
-            </button>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#FC5D36' }} />
+            <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#363636' }}>MCP Connected</span>
           </div>
         </div>
       </header>
@@ -187,11 +179,9 @@ export default function App() {
               HealthPrior — Latitude Health Assessment
             </span>
           </div>
-          <div style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#9ca3af' }}>
-            <span>Privacy Policy</span>
-            <span className="mx-2">|</span>
-            <span>Terms of Service</span>
-          </div>
+          <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#9ca3af' }}>
+            Molina MCR-621 · CPT 72148 · FHIR R4
+          </span>
         </div>
       </footer>
     </div>
