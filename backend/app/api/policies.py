@@ -62,7 +62,7 @@ async def create_policy(policy: PolicyCreate, db: AsyncSession = Depends(get_db)
     await db.execute(
         text("""
             INSERT INTO policies (id, payer, procedure_name, cpt_code, criteria)
-            VALUES (:id, :payer, :procedure_name, :cpt_code, :criteria::jsonb)
+            VALUES (:id, :payer, :procedure_name, :cpt_code, cast(:criteria as jsonb))
         """),
         {
             "id": policy.id,

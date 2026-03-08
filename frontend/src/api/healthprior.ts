@@ -24,7 +24,8 @@ export const structureNote = (note: string, model?: string, policy_id?: string) 
   );
 
 export const getPolicies = () =>
-  fetchJSON<Array<{ id: string; name: string; description?: string }>>(`${API_BASE}/policies`);
+  fetchJSON<Array<{ id: string; payer: string; procedure_name: string; cpt_code: string }>>(`${API_BASE}/policies`)
+    .then(rows => rows.map(p => ({ id: p.id, name: `${p.payer}: ${p.procedure_name} (${p.cpt_code})` })));
 
 export const getSubmissionAudit = (id: string) =>
   fetchJSON<import('../types').AuditTrail>(`${API_BASE}/submissions/${id}/audit`);
@@ -53,9 +54,9 @@ export const generatePriorAuth = (
   });
 
 export const getSubmissionHistory = () =>
-  fetchJSON<Array<{ id: string; created_at: string; decision: string | null; raw_note_preview: string }>>(
+  fetchJSON<{ total: number; page: number; items: Array<{ id: string; created_at: string; decision: string | null; raw_note_preview: string }> }>(
     `${API_BASE}/prior-auth/history`
-  );
+  ).then(r => r.items);
 
 export interface AuthUser {
   authenticated: boolean;
