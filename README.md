@@ -53,11 +53,22 @@ cd backend && pytest tests/ -v
 
 The MCP HTTP server (port 8001) exposes the following tools for AI agent use:
 
-- `parse_clinical_note` — Extract structured data from free-text clinical notes
-- `check_coverage` — Verify patient insurance coverage for a procedure
-- `generate_prior_auth` — Generate a prior authorization request document
-- `get_icd10_codes` — Map diagnoses to ICD-10 codes
-- `get_cpt_codes` — Map procedures to CPT codes
+- `get_coverage_criteria` — Retrieve structured coverage criteria for a payer policy (e.g. Molina MCR-621)
+- `search_icd10_codes` — Map a clinical condition description to relevant ICD-10 codes
+- `validate_fhir_resource` — Validate a FHIR resource structure and return errors/warnings
+- `get_prior_auth_requirements` — Get prior auth documentation requirements for a CPT code and payer
+- `health_check` — Health check for the MCP server
+
+## Policy Ingestion
+
+Coverage criteria are stored as structured JSON in `backend/app/data/` and loaded at runtime via `policy_loader.py`. The included `molina_mcr621_criteria.json` was extracted from the Molina MCR-621 PDF (Lumbar Spine MRI, CPT 72148/72149/72158).
+
+To regenerate criteria JSON from an updated PDF:
+
+```bash
+cd backend
+python scripts/ingest_policy.py --pdf path/to/Lumbar_Spine_MRI.pdf --policy MCR-621
+```
 
 ## GitHub Secrets Required
 

@@ -1,16 +1,16 @@
 from app.services.llm_service import LLMService
-from app.data.molina_mcr621_criteria import MOLINA_MCR621
+from app.data.policy_loader import load_policy
 from app.models.schemas import FHIRBundle, CoverageResult
 
 
 class CoverageService:
     def __init__(self, llm_service: LLMService):
         self.llm = llm_service
-        self._policies = {"MCR-621": MOLINA_MCR621}
+        self._policies: dict[str, dict] = {}
 
     def get_policy(self, policy_id: str) -> dict:
         if policy_id not in self._policies:
-            raise ValueError(f"Unknown policy: {policy_id}")
+            self._policies[policy_id] = load_policy(policy_id)
         return self._policies[policy_id]
 
     async def evaluate(self, fhir_bundle: FHIRBundle, policy_id: str = "MCR-621") -> CoverageResult:

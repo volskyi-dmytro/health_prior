@@ -5,7 +5,7 @@ Real HTTP MCP server using fastmcp — invoked by the backend LLM workflow.
 import json
 import uvicorn
 from fastmcp import FastMCP
-from app.data.molina_mcr621_criteria import MOLINA_MCR621
+from app.data.policy_loader import load_policy
 
 mcp = FastMCP("HealthPrior Clinical MCP Server")
 
@@ -33,10 +33,10 @@ async def get_coverage_criteria(policy_id: str) -> dict:
     Args:
         policy_id: Policy identifier (e.g., 'MCR-621')
     """
-    policies = {"MCR-621": MOLINA_MCR621}
-    if policy_id not in policies:
-        return {"error": f"Policy {policy_id} not found", "available": list(policies.keys())}
-    return policies[policy_id]
+    try:
+        return load_policy(policy_id)
+    except FileNotFoundError:
+        return {"error": f"Policy {policy_id} not found"}
 
 
 @mcp.tool()

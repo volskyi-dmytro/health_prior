@@ -27,6 +27,10 @@ dist/
 .env.*
 !.env.example
 
+# Local Claude context
+CLAUDE.md
+prompts/
+
 # Editor
 .idea/
 .vscode/
