@@ -25,6 +25,22 @@ from app.core.config import settings
 router = APIRouter(prefix="/notes", tags=["notes"])
 
 
+class FHIRFetchRequest(BaseModel):
+    fhir_server_url: str = "https://hapi.fhir.org/baseR4"
+    patient_id: str
+    policy_id: str = "MCR-621"
+    session_id: str | None = None
+
+
+class FHIRFetchResponse(BaseModel):
+    fhir_bundle: dict
+    patient_name: str
+    source: str  # "fhir_server"
+    fhir_server_url: str
+    patient_id: str
+    resource_counts: dict  # {"Condition": 3, "MedicationRequest": 2, ...}
+
+
 class NoteStructureRequestExtended(NoteStructureRequest):
     model_b: Optional[str] = None
 
@@ -201,4 +217,84 @@ async def structure_note_stream(
             "Cache-Control": "no-cache",
             "X-Accel-Buffering": "no",
         },
+    )
+
+
+def _extract_patient_name(bundle: dict) -> str:
+    """Pull a human-readable name from the Patient resource in a FHIR Bundle."""
+    for entry in bundle.get("entry", []):
+        resource = entry.get("resource", entry)
+        if resource.get("resourceType") == "Patient":
+            names = resource.get("name", [])
+            if names:
+                name_obj = names[0]
+                given = " ".join(name_obj.get("given", []))
+                family = name_obj.get("family", "")
+                full = f"{given} {family}".strip()
+                if full:
+                    return full
+                if name_obj.get("text"):
+                    return name_obj["text"]
+    return "Unknown"
+
+
+def _count_resources(bundle: dict) -> dict:
+    """Return a dict of {resourceType: count} for all entries in the bundle."""
+    counts: dict[str, int] = {}
+    for entry in bundle.get("entry", []):
+        resource = entry.get("resource", entry)
+        rt = resource.get("resourceType")
+        if rt:
+            counts[rt] = counts.get(rt, 0) + 1
+    return counts
+
+
+@router.post("/fetch-fhir", response_model=FHIRFetchResponse)
+async def fetch_fhir_patient(
+    request: FHIRFetchRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Fetch a live patient record from a FHIR R4 server via the MCP tool layer.
+
+    - Calls the MCP fetch_patient_record tool against the specified FHIR server
+    - Returns a FHIR Bundle with Patient, Conditions, MedicationRequests, and Observations
+    - Writes an audit log entry for observability
+    """
+    mcp_client = MCPClient()
+    result = await mcp_client.call_tool(
+        "fetch_patient_record",
+        {
+            "fhir_server_url": request.fhir_server_url,
+            "patient_id": request.patient_id,
+        },
+    )
+
+    if isinstance(result, dict) and result.get("error"):
+        raise HTTPException(status_code=404, detail=result["error"])
+
+    # result is the FHIR Bundle
+    fhir_bundle = result if isinstance(result, dict) else {}
+    patient_name = _extract_patient_name(fhir_bundle)
+    resource_counts = _count_resources(fhir_bundle)
+
+    # Audit log — non-fatal
+    await log_llm_call(
+        db=db,
+        event_type="fhir_fetch",
+        model_used=None,
+        prompt_tokens=None,
+        completion_tokens=None,
+        latency_ms=None,
+        mcp_tools_called=["fetch_patient_record", request.fhir_server_url],
+        submission_id=request.session_id,
+    )
+
+    return FHIRFetchResponse(
+        fhir_bundle=fhir_bundle,
+        patient_name=patient_name,
+        source="fhir_server",
+        fhir_server_url=request.fhir_server_url,
+        patient_id=request.patient_id,
+        resource_counts=resource_counts,
     )

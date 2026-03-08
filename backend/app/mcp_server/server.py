@@ -2,8 +2,10 @@
 HealthPrior Clinical MCP Server
 Real HTTP MCP server using fastmcp — invoked by the backend LLM workflow.
 """
+import asyncio
 import json
 import uvicorn
+import httpx
 from fastmcp import FastMCP
 from app.data.policy_loader import load_policy
 
@@ -22,6 +24,16 @@ ICD10_LOOKUP = {
     "muscle spasm": [{"code": "M62.838", "description": "Muscle spasm, other site"}],
     "degenerative disc disease": [{"code": "M51.36", "description": "Other intervertebral disc degeneration, lumbar region"}],
 }
+
+# Module-level cache for StructureDefinitions to avoid redundant network fetches
+_sd_cache: dict[str, dict] = {}
+
+FHIR_HEADERS = {"Accept": "application/fhir+json"}
+
+
+def _extract_bundle_entries(bundle: dict) -> list[dict]:
+    """Return the resource objects from a FHIR searchset Bundle."""
+    return [e.get("resource", e) for e in bundle.get("entry", [])]
 
 
 @mcp.tool()
@@ -159,10 +171,126 @@ async def get_prior_auth_requirements(procedure_code: str, payer: str) -> dict:
 @mcp.tool()
 async def health_check() -> dict:
     """Health check endpoint for the MCP server."""
-    return {"status": "ok", "service": "healthprior-mcp", "tools": 5}
+    return {"status": "ok", "service": "healthprior-mcp", "tools": 8}
 
 
-# Wrap MCP ASGI app in FastAPI to add /health route for Docker health checks
+@mcp.tool()
+async def fetch_patient_record(fhir_server_url: str, patient_id: str) -> dict:
+    """Fetch a complete patient clinical record from a FHIR R4 server.
+
+    Retrieves Patient demographics, active Conditions, current MedicationRequests,
+    and recent Observations using FHIR search operations.
+
+    Args:
+        fhir_server_url: Base URL of the FHIR R4 server (e.g. https://hapi.fhir.org/baseR4)
+        patient_id: FHIR Patient resource ID
+    """
+    base = fhir_server_url.rstrip("/")
+
+    async def _get(client: httpx.AsyncClient, url: str, params: dict | None = None) -> dict | None:
+        try:
+            resp = await client.get(url, params=params, headers=FHIR_HEADERS)
+            if resp.status_code == 404:
+                return None
+            resp.raise_for_status()
+            return resp.json()
+        except httpx.HTTPStatusError:
+            return None
+        except Exception:
+            return None
+
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            patient_data, conditions_data, medications_data, observations_data = await asyncio.gather(
+                _get(client, f"{base}/Patient/{patient_id}"),
+                _get(client, f"{base}/Condition", {"patient": patient_id, "clinical-status": "active"}),
+                _get(client, f"{base}/MedicationRequest", {"patient": patient_id, "status": "active"}),
+                _get(client, f"{base}/Observation", {"patient": patient_id, "_sort": "-date", "_count": "20"}),
+            )
+    except Exception as exc:
+        return {"error": f"Connection error reaching FHIR server: {exc}"}
+
+    if patient_data is None:
+        return {"error": f"Patient {patient_id} not found on FHIR server {fhir_server_url}"}
+
+    conditions = _extract_bundle_entries(conditions_data) if conditions_data else []
+    medications = _extract_bundle_entries(medications_data) if medications_data else []
+    observations = _extract_bundle_entries(observations_data) if observations_data else []
+
+    bundle = {
+        "resourceType": "Bundle",
+        "type": "searchset",
+        "entry": [
+            {"resource": patient_data},
+            *[{"resource": r} for r in conditions],
+            *[{"resource": r} for r in medications],
+            *[{"resource": r} for r in observations],
+        ],
+    }
+    return bundle
+
+
+@mcp.tool()
+async def search_fhir_resources(
+    fhir_server_url: str,
+    resource_type: str,
+    search_params: dict,
+) -> dict:
+    """Search FHIR resources by type and search parameters.
+
+    Executes a FHIR search operation using standard SearchParameters.
+
+    Args:
+        fhir_server_url: Base URL of the FHIR R4 server
+        resource_type: FHIR resource type (Patient, Condition, Observation, etc.)
+        search_params: Dict of FHIR search parameter name→value pairs
+    """
+    base = fhir_server_url.rstrip("/")
+    params = {**search_params, "_format": "json"}
+
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.get(
+                f"{base}/{resource_type}",
+                params=params,
+                headers=FHIR_HEADERS,
+            )
+            resp.raise_for_status()
+            return resp.json()
+    except httpx.HTTPStatusError as exc:
+        return {"error": f"FHIR server returned {exc.response.status_code}", "resource_type": resource_type}
+    except Exception as exc:
+        return {"error": f"Connection error: {exc}", "resource_type": resource_type}
+
+
+@mcp.tool()
+async def get_structure_definition(resource_type: str) -> dict:
+    """Retrieve the FHIR R4 StructureDefinition for a resource type.
+
+    Provides schema grounding — field names, cardinality, data types,
+    and required elements — enabling accurate FHIR resource construction.
+
+    Args:
+        resource_type: FHIR resource type name (e.g. Condition, MedicationRequest)
+    """
+    if resource_type in _sd_cache:
+        return _sd_cache[resource_type]
+
+    url = f"https://hl7.org/fhir/R4/{resource_type}.profile.json"
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.get(url)
+            resp.raise_for_status()
+            sd = resp.json()
+            _sd_cache[resource_type] = sd
+            return sd
+    except Exception:
+        return {"error": "StructureDefinition not available", "resource_type": resource_type}
+
+
+# ---------------------------------------------------------------------------
+# Wrap MCP ASGI app in FastAPI to add /health and /.well-known/mcp.json routes
+# ---------------------------------------------------------------------------
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from starlette.routing import Mount
@@ -171,9 +299,111 @@ _mcp_asgi = mcp.http_app()
 
 app = FastAPI(title="HealthPrior MCP Server")
 
+
 @app.get("/health")
 async def health():
     return JSONResponse({"status": "ok", "service": "healthprior-mcp"})
+
+
+@app.get("/.well-known/mcp.json")
+async def mcp_discovery():
+    """Machine-readable MCP tool discovery document (Braman pattern)."""
+    return JSONResponse({
+        "schema_version": "1.0",
+        "name": "HealthPrior Clinical MCP Server",
+        "description": "FHIR-aware MCP tooling for prior authorization clinical workflows",
+        "tools": [
+            {
+                "name": "get_coverage_criteria",
+                "description": "Retrieve clinical coverage criteria for a given payer policy ID. Returns structured decision criteria from Molina MCR-621 for Lumbar Spine MRI.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "policy_id": {"type": "string", "description": "Policy identifier (e.g., 'MCR-621')"},
+                    },
+                    "required": ["policy_id"],
+                },
+            },
+            {
+                "name": "search_icd10_codes",
+                "description": "Search ICD-10 codes relevant to a clinical condition description.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "condition_description": {"type": "string", "description": "Plain English description of the condition"},
+                    },
+                    "required": ["condition_description"],
+                },
+            },
+            {
+                "name": "validate_fhir_resource",
+                "description": "Validate a FHIR resource structure and return validation results.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "resource": {"type": "object", "description": "FHIR resource dict to validate"},
+                    },
+                    "required": ["resource"],
+                },
+            },
+            {
+                "name": "get_prior_auth_requirements",
+                "description": "Get prior authorization requirements for a procedure code and payer.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "procedure_code": {"type": "string", "description": "CPT code (e.g., '72148')"},
+                        "payer": {"type": "string", "description": "Payer name (e.g., 'Molina Healthcare')"},
+                    },
+                    "required": ["procedure_code", "payer"],
+                },
+            },
+            {
+                "name": "health_check",
+                "description": "Health check endpoint for the MCP server.",
+                "input_schema": {"type": "object", "properties": {}, "required": []},
+            },
+            {
+                "name": "fetch_patient_record",
+                "description": "Fetch a complete patient clinical record from a FHIR R4 server. Retrieves Patient demographics, active Conditions, current MedicationRequests, and recent Observations using FHIR search operations.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "fhir_server_url": {"type": "string", "description": "Base URL of the FHIR R4 server (e.g. https://hapi.fhir.org/baseR4)"},
+                        "patient_id": {"type": "string", "description": "FHIR Patient resource ID"},
+                    },
+                    "required": ["fhir_server_url", "patient_id"],
+                },
+            },
+            {
+                "name": "search_fhir_resources",
+                "description": "Search FHIR resources by type and search parameters. Executes a FHIR search operation using standard SearchParameters.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "fhir_server_url": {"type": "string", "description": "Base URL of the FHIR R4 server"},
+                        "resource_type": {"type": "string", "description": "FHIR resource type (Patient, Condition, Observation, etc.)"},
+                        "search_params": {"type": "object", "description": "Dict of FHIR search parameter name→value pairs"},
+                    },
+                    "required": ["fhir_server_url", "resource_type", "search_params"],
+                },
+            },
+            {
+                "name": "get_structure_definition",
+                "description": "Retrieve the FHIR R4 StructureDefinition for a resource type. Provides schema grounding for accurate FHIR resource construction.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "resource_type": {"type": "string", "description": "FHIR resource type name (e.g. Condition, MedicationRequest)"},
+                    },
+                    "required": ["resource_type"],
+                },
+            },
+        ],
+        "fhir_base": "https://hapi.fhir.org/baseR4",
+        "capabilities": ["fhir_search", "fhir_read", "icd10_lookup", "fhir_validation", "coverage_criteria"],
+    })
+
 
 app.mount("/", _mcp_asgi)
 

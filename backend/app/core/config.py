@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     SESSION_SECRET_KEY: str = "dev-insecure-key-change-in-production"
     ADMIN_GITHUB_EMAIL: str = ""
     ENABLE_PDF_EXPORT: bool = True
+    FHIR_SERVER_URL: str = "https://hapi.fhir.org/baseR4"
 
     @property
     def CORS_ORIGINS_LIST(self) -> List[str]:
