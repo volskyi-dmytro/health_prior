@@ -15,7 +15,7 @@ async def seed_policies(session):
         await session.execute(
             text("""
                 INSERT INTO policies (id, payer, procedure_name, cpt_code, criteria)
-                VALUES (:id, :payer, :procedure_name, :cpt_code, :criteria::jsonb)
+                VALUES (:id, :payer, :procedure_name, :cpt_code, cast(:criteria as jsonb))
             """),
             {
                 "id": "MCR-621",
