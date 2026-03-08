@@ -25,8 +25,11 @@ export function Step1_NoteInput({ onSubmit, loading }: Props) {
     getSampleNotes().then(setSamples).catch(console.error);
   }, []);
 
-  const decisionColor = (d: string) =>
-    d === 'APPROVED' ? 'text-teal-400' : d === 'DENIED' ? 'text-red-400' : 'text-amber-400';
+  const decisionStyle = (d: string) => {
+    if (d === 'APPROVED') return { color: '#16a34a', background: 'rgba(34,197,94,0.1)', padding: '2px 8px', borderRadius: '100px' };
+    if (d === 'DENIED') return { color: '#FC5D36', background: 'rgba(252,93,54,0.1)', padding: '2px 8px', borderRadius: '100px' };
+    return { color: '#d97706', background: 'rgba(253,179,82,0.15)', padding: '2px 8px', borderRadius: '100px' };
+  };
 
   return (
     <motion.div
@@ -37,11 +40,18 @@ export function Step1_NoteInput({ onSubmit, loading }: Props) {
       className="max-w-3xl mx-auto"
     >
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-teal-500/10 border border-teal-500/30 mb-4">
-          <Stethoscope className="w-7 h-7 text-teal-400" />
+        <div
+          className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4"
+          style={{ background: 'rgba(252,93,54,0.1)', border: '1px solid rgba(252,93,54,0.25)' }}
+        >
+          <Stethoscope className="w-7 h-7" style={{ color: '#FC5D36' }} />
         </div>
-        <h2 className="text-2xl font-display text-white mb-2">Clinical Note Input</h2>
-        <p className="text-slate-400 text-sm">
+        <h2
+          style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '28px', color: '#000', marginBottom: '8px' }}
+        >
+          Clinical Note Input
+        </h2>
+        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: '#6b7280' }}>
           Paste a clinical note or select a sample to begin prior authorization analysis
         </p>
       </div>
@@ -49,20 +59,45 @@ export function Step1_NoteInput({ onSubmit, loading }: Props) {
       {/* Sample note buttons */}
       {samples.length > 0 && (
         <div className="grid grid-cols-1 gap-2 mb-4">
-          <p className="text-xs font-mono text-slate-500 uppercase tracking-wider">Load sample note:</p>
+          <p
+            className="uppercase tracking-wider"
+            style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af' }}
+          >
+            Load sample note:
+          </p>
           {samples.map((s) => (
             <button
               key={s.id}
               onClick={() => setNote(s.content)}
-              className="flex items-center justify-between p-3 rounded-lg border border-slate-700 bg-slate-800/50 hover:border-teal-500/50 hover:bg-teal-500/5 transition-all text-left group"
+              className="flex items-center justify-between p-4 rounded-xl text-left group transition-all"
+              style={{ border: '1px solid #e5e7eb', background: '#FFFFFF' }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(252,93,54,0.4)';
+                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(252,93,54,0.04)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor = '#e5e7eb';
+                (e.currentTarget as HTMLButtonElement).style.background = '#FFFFFF';
+              }}
             >
               <div>
-                <span className="text-sm text-slate-200 font-medium group-hover:text-teal-300 transition-colors">
+                <span
+                  className="block"
+                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', fontWeight: 500, color: '#060B13' }}
+                >
                   {s.title}
                 </span>
-                <span className="text-xs text-slate-500 block mt-0.5">{s.description}</span>
+                <span
+                  className="block mt-0.5"
+                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#9ca3af' }}
+                >
+                  {s.description}
+                </span>
               </div>
-              <span className={`text-xs font-mono font-bold ${decisionColor(s.expected_decision)}`}>
+              <span
+                className="text-xs font-bold"
+                style={{ fontFamily: 'Inter, sans-serif', ...decisionStyle(s.expected_decision) }}
+              >
                 {s.expected_decision}
               </span>
             </button>
@@ -75,17 +110,34 @@ export function Step1_NoteInput({ onSubmit, loading }: Props) {
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder="Paste clinical note here (H&P, discharge summary, progress note)..."
-        className="w-full h-64 p-4 bg-slate-900/80 border border-slate-700 rounded-xl text-slate-200 text-sm font-mono resize-none focus:outline-none focus:border-teal-500/60 focus:ring-1 focus:ring-teal-500/30 placeholder-slate-600 transition-all"
+        className="w-full h-64 p-4 resize-none focus:outline-none transition-all rounded-xl"
+        style={{
+          fontFamily: 'Inter, monospace',
+          fontSize: '13px',
+          color: '#060B13',
+          background: '#FFFFFF',
+          border: '1px solid #e5e7eb',
+          lineHeight: '1.6',
+        }}
+        onFocus={e => { e.currentTarget.style.borderColor = 'rgba(252,93,54,0.5)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(252,93,54,0.08)'; }}
+        onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.boxShadow = 'none'; }}
       />
 
       {/* Model picker + submit */}
       <div className="flex items-center gap-3 mt-4">
         <div className="flex items-center gap-2 flex-1">
-          <Cpu className="w-4 h-4 text-slate-500" />
+          <Cpu className="w-4 h-4" style={{ color: '#9ca3af' }} />
           <select
             value={model}
             onChange={(e) => setModel(e.target.value)}
-            className="bg-slate-800 border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-teal-500/50 font-mono flex-1"
+            className="rounded-[100px] px-4 py-2 focus:outline-none flex-1 transition-all"
+            style={{
+              fontFamily: 'Instrument Sans, sans-serif',
+              fontSize: '14px',
+              color: '#363636',
+              background: '#FFFFFF',
+              border: '1px solid #e5e7eb',
+            }}
           >
             {MODELS.map((m) => (
               <option key={m.value} value={m.value}>{m.label}</option>
@@ -98,13 +150,13 @@ export function Step1_NoteInput({ onSubmit, loading }: Props) {
           disabled={!note.trim() || loading}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="flex items-center gap-2 px-6 py-2.5 bg-teal-500 hover:bg-teal-400 disabled:bg-slate-700 disabled:text-slate-500 text-navy-900 font-semibold rounded-lg transition-all shadow-[0_0_20px_rgba(45,212,191,0.3)] disabled:shadow-none"
+          className="btn-primary flex items-center gap-2"
         >
           {loading ? (
-            <span className="text-sm">Analyzing...</span>
+            <span>Analyzing...</span>
           ) : (
             <>
-              <span className="text-sm">Analyze Note</span>
+              <span>Analyze Note</span>
               <ChevronRight className="w-4 h-4" />
             </>
           )}

@@ -4,15 +4,27 @@ export default {
   theme: {
     extend: {
       colors: {
-        navy: {
-          900: '#0a0f1e',
-          800: '#0d1427',
-          700: '#111b38',
+        orange: {
+          primary: '#FC5D36',
+        },
+        amber: {
+          primary: '#FDB352',
+        },
+        lat: {
+          orange: '#FC5D36',
+          amber: '#FDB352',
+          peach: '#FFF6EA',
+          warmBg: '#FAF9F5',
+          announceBg: '#F9BA54',
+          text: '#060B13',
+          muted: '#363636',
+          card: 'rgba(253,179,82,0.12)',
         },
       },
       fontFamily: {
-        display: ['"DM Serif Display"', 'Georgia', 'serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        display: ['"General Sans"', 'sans-serif'],
+        body: ['"Instrument Sans"', 'sans-serif'],
+        ui: ['"Inter"', 'sans-serif'],
       },
     },
   },

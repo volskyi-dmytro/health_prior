@@ -73,37 +73,70 @@ export default function App() {
   };
 
   return (
-    <div
-      className="min-h-screen bg-navy-900 text-white"
-      style={{ background: 'linear-gradient(135deg, #0a0f1e 0%, #0d1427 50%, #0a0f1e 100%)' }}
-    >
-      {/* Header */}
-      <header className="border-b border-slate-800/60 px-6 py-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
+    <div className="min-h-screen" style={{ background: '#FAF9F5' }}>
+      {/* Announcement bar */}
+      <div
+        className="w-full text-center py-2 px-4 text-sm"
+        style={{ background: '#F9BA54', fontFamily: 'Instrument Sans, sans-serif', color: '#000' }}
+      >
+        Prior authorization automation powered by clinical AI — Molina MCR-621 · CPT 72148 · FHIR R4
+      </div>
+
+      {/* Navigation */}
+      <header
+        className="sticky top-0 z-50 border-b px-6"
+        style={{ background: '#FFFFFF', borderColor: '#e5e7eb', height: '72px', display: 'flex', alignItems: 'center' }}
+      >
+        <div className="max-w-5xl mx-auto w-full flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-teal-500 flex items-center justify-center">
-              <span className="text-navy-900 font-bold text-sm">HP</span>
+            {/* Logo mark */}
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(110deg, #FDB352 0%, #FC5D36 100%)' }}
+            >
+              <span style={{ color: '#fff', fontFamily: 'General Sans, sans-serif', fontWeight: 600, fontSize: '14px' }}>HP</span>
             </div>
             <div>
-              <span className="font-display text-lg text-white">HealthPrior</span>
-              <span className="text-slate-500 text-xs ml-2 font-mono">Clinical AI</span>
+              <span style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '18px', color: '#000' }}>
+                HealthPrior
+              </span>
+              <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#FC5D36', marginLeft: '8px' }}>
+                Clinical AI
+              </span>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-            <span className="text-xs font-mono text-slate-400">MCP Connected</span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#FC5D36' }} />
+              <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#363636' }}>MCP Connected</span>
+            </div>
+            <button
+              className="btn-primary"
+              style={{ paddingLeft: '20px', paddingRight: '20px', paddingTop: '8px', paddingBottom: '8px' }}
+            >
+              Book a Demo
+            </button>
           </div>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="max-w-5xl mx-auto px-6 py-8">
+      <main className="max-w-5xl mx-auto px-6 py-10">
         <WizardProgress current={step} />
 
         {error && (
-          <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-mono">
-            {error}
-            <button onClick={() => setError(null)} className="ml-3 text-red-600 hover:text-red-400">x</button>
+          <div
+            className="mb-6 p-4 rounded-xl text-sm flex items-center justify-between"
+            style={{ background: 'rgba(252,93,54,0.08)', border: '1px solid rgba(252,93,54,0.3)', color: '#FC5D36', fontFamily: 'Instrument Sans, sans-serif' }}
+          >
+            <span>{error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="ml-3 hover:opacity-70 transition-opacity"
+              style={{ color: '#FC5D36', fontWeight: 600 }}
+            >
+              ×
+            </button>
           </div>
         )}
 
@@ -141,10 +174,24 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/60 px-6 py-4 mt-8">
-        <div className="max-w-5xl mx-auto flex items-center justify-between text-xs font-mono text-slate-600">
-          <span>HealthPrior v1.0 — Latitude Health Assessment</span>
-          <span>Molina MCR-621 · CPT 72148 · FHIR R4</span>
+      <footer className="border-t px-6 py-6 mt-10" style={{ borderColor: '#e5e7eb', background: '#FFFFFF' }}>
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center"
+              style={{ background: 'linear-gradient(110deg, #FDB352 0%, #FC5D36 100%)' }}
+            >
+              <span style={{ color: '#fff', fontSize: '11px', fontWeight: 600 }}>HP</span>
+            </div>
+            <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#363636' }}>
+              HealthPrior — Latitude Health Assessment
+            </span>
+          </div>
+          <div style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#9ca3af' }}>
+            <span>Privacy Policy</span>
+            <span className="mx-2">|</span>
+            <span>Terms of Service</span>
+          </div>
         </div>
       </footer>
     </div>

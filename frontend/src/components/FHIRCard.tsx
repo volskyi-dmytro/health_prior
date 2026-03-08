@@ -3,9 +3,27 @@ import { Activity, Pill, Eye, User } from 'lucide-react';
 import type { FHIRResource } from '../types';
 
 const resourceConfig = {
-  Condition: { icon: Activity, color: 'border-blue-500 bg-blue-500/10', iconColor: 'text-blue-400', label: 'Condition' },
-  MedicationRequest: { icon: Pill, color: 'border-green-500 bg-green-500/10', iconColor: 'text-green-400', label: 'Medication' },
-  Observation: { icon: Eye, color: 'border-amber-500 bg-amber-500/10', iconColor: 'text-amber-400', label: 'Observation' },
+  Condition: {
+    icon: Activity,
+    bg: 'rgba(252,93,54,0.07)',
+    border: 'rgba(252,93,54,0.25)',
+    iconColor: '#FC5D36',
+    label: 'Condition',
+  },
+  MedicationRequest: {
+    icon: Pill,
+    bg: 'rgba(253,179,82,0.1)',
+    border: 'rgba(253,179,82,0.35)',
+    iconColor: '#FDB352',
+    label: 'Medication',
+  },
+  Observation: {
+    icon: Eye,
+    bg: 'rgba(99,102,241,0.07)',
+    border: 'rgba(99,102,241,0.25)',
+    iconColor: '#6366f1',
+    label: 'Observation',
+  },
 };
 
 interface Props {
@@ -16,8 +34,9 @@ interface Props {
 export function FHIRCard({ resource, index }: Props) {
   const config = resourceConfig[resource.resourceType as keyof typeof resourceConfig] ?? {
     icon: User,
-    color: 'border-slate-500 bg-slate-500/10',
-    iconColor: 'text-slate-400',
+    bg: 'rgba(156,163,175,0.07)',
+    border: 'rgba(156,163,175,0.25)',
+    iconColor: '#9ca3af',
     label: resource.resourceType,
   };
   const Icon = config.icon;
@@ -41,31 +60,42 @@ export function FHIRCard({ resource, index }: Props) {
       initial={{ opacity: 0, x: 40 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.12, duration: 0.4, ease: 'easeOut' }}
-      className={`rounded-lg border p-4 mb-3 ${config.color}`}
+      className="rounded-xl p-4 mb-3"
+      style={{ background: config.bg, border: `1px solid ${config.border}` }}
     >
       <div className="flex items-start gap-3">
-        <div className={`mt-0.5 ${config.iconColor}`}>
-          <Icon className="w-4 h-4" />
+        <div className="mt-0.5">
+          <Icon className="w-4 h-4" style={{ color: config.iconColor }} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className={`text-xs font-mono uppercase tracking-wider ${config.iconColor}`}>
+            <span
+              className="uppercase tracking-wider"
+              style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: config.iconColor }}
+            >
               {config.label}
             </span>
             {icdCode && (
-              <span className="text-xs font-mono bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">
+              <span
+                className="px-1.5 py-0.5 rounded-md"
+                style={{ fontFamily: 'Inter, monospace', fontSize: '10px', background: 'rgba(0,0,0,0.06)', color: '#363636' }}
+              >
                 {icdCode}
               </span>
             )}
           </div>
-          <p className="text-sm text-slate-200 font-medium leading-snug">{title}</p>
+          <p className="text-sm font-medium leading-snug" style={{ fontFamily: 'Instrument Sans, sans-serif', color: '#060B13' }}>
+            {title}
+          </p>
           {detail && (
-            <p className="text-xs text-slate-400 mt-1 leading-relaxed">{detail}</p>
+            <p className="text-xs mt-1 leading-relaxed" style={{ fontFamily: 'Instrument Sans, sans-serif', color: '#6b7280' }}>
+              {detail}
+            </p>
           )}
           {resource._sourceRef && (
             <div className="mt-2 flex items-center gap-1.5">
-              <div className="w-1 h-1 rounded-full bg-teal-500" />
-              <span className="text-xs text-teal-600 font-mono">
+              <div className="w-1 h-1 rounded-full" style={{ background: '#FC5D36' }} />
+              <span style={{ fontFamily: 'Inter, monospace', fontSize: '11px', color: '#FC5D36' }}>
                 {resource._sourceRef}
               </span>
             </div>

@@ -9,12 +9,12 @@ interface Props {
 function colorizeJson(json: string): string {
   return json
     .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?)/g, (match) => {
-      if (/:$/.test(match)) return `<span class="text-blue-300">${match}</span>`;
-      return `<span class="text-green-300">${match}</span>`;
+      if (/:$/.test(match)) return `<span style="color:#FC5D36">${match}</span>`;
+      return `<span style="color:#059669">${match}</span>`;
     })
-    .replace(/\b(true|false)\b/g, '<span class="text-amber-300">$1</span>')
-    .replace(/\bnull\b/g, '<span class="text-red-400">null</span>')
-    .replace(/\b(-?\d+(\.\d+)?)\b/g, '<span class="text-purple-300">$1</span>');
+    .replace(/\b(true|false)\b/g, '<span style="color:#FDB352">$1</span>')
+    .replace(/\bnull\b/g, '<span style="color:#ef4444">null</span>')
+    .replace(/\b(-?\d+(\.\d+)?)\b/g, '<span style="color:#6366f1">$1</span>');
 }
 
 export function JsonViewer({ data, title = 'JSON' }: Props) {
@@ -30,22 +30,26 @@ export function JsonViewer({ data, title = 'JSON' }: Props) {
   };
 
   return (
-    <div className="rounded-lg border border-slate-700 overflow-hidden">
+    <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #e5e7eb' }}>
       <div
-        className="flex items-center justify-between px-4 py-2 bg-slate-800/80 cursor-pointer"
+        className="flex items-center justify-between px-4 py-3 cursor-pointer"
+        style={{ background: '#FAF9F5', borderBottom: collapsed ? 'none' : '1px solid #e5e7eb' }}
         onClick={() => setCollapsed(!collapsed)}
       >
         <div className="flex items-center gap-2">
           {collapsed ? (
-            <ChevronRight className="w-4 h-4 text-slate-400" />
+            <ChevronRight className="w-4 h-4" style={{ color: '#9ca3af' }} />
           ) : (
-            <ChevronDown className="w-4 h-4 text-slate-400" />
+            <ChevronDown className="w-4 h-4" style={{ color: '#9ca3af' }} />
           )}
-          <span className="text-sm font-mono text-slate-300">{title}</span>
+          <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', fontWeight: 500, color: '#363636' }}>
+            {title}
+          </span>
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); handleCopy(); }}
-          className="flex items-center gap-1 text-xs text-slate-400 hover:text-teal-400 transition-colors"
+          className="flex items-center gap-1 transition-colors"
+          style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: copied ? '#FC5D36' : '#9ca3af' }}
         >
           {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
           {copied ? 'Copied' : 'Copy'}
@@ -53,7 +57,8 @@ export function JsonViewer({ data, title = 'JSON' }: Props) {
       </div>
       {!collapsed && (
         <pre
-          className="p-4 text-xs font-mono overflow-auto max-h-96 bg-slate-900/50 text-slate-300 leading-relaxed"
+          className="p-4 text-xs overflow-auto max-h-96 leading-relaxed"
+          style={{ fontFamily: 'Inter, monospace', background: '#FFFFFF', color: '#363636' }}
           dangerouslySetInnerHTML={{ __html: colorizeJson(jsonStr) }}
         />
       )}

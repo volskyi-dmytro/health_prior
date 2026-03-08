@@ -11,40 +11,43 @@ const steps = [
 
 export function WizardProgress({ current }: { current: WizardStep }) {
   return (
-    <div className="flex items-center justify-center mb-8">
+    <div className="flex items-center justify-center mb-10">
       {steps.map((step, i) => (
         <div key={step.id} className="flex items-center">
           <div className="flex flex-col items-center">
             <motion.div
-              className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
+              className="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all"
+              style={
                 current > step.id
-                  ? 'bg-teal-500 border-teal-500 text-navy-900'
+                  ? { background: '#FC5D36', borderColor: '#FC5D36', color: '#fff' }
                   : current === step.id
-                  ? 'bg-transparent border-teal-400 text-teal-400 shadow-[0_0_12px_rgba(45,212,191,0.4)]'
-                  : 'bg-transparent border-slate-600 text-slate-600'
-              }`}
+                  ? { background: 'transparent', borderColor: '#FC5D36', color: '#FC5D36', boxShadow: '0 0 12px rgba(252,93,54,0.3)' }
+                  : { background: 'transparent', borderColor: '#d1d5db', color: '#9ca3af' }
+              }
               animate={current === step.id ? { scale: [1, 1.05, 1] } : {}}
               transition={{ duration: 2, repeat: Infinity }}
             >
               {current > step.id ? (
                 <Check className="w-5 h-5" />
               ) : (
-                <span className="text-sm font-bold font-mono">{step.id}</span>
+                <span style={{ fontSize: '14px', fontWeight: 700, fontFamily: 'Inter, sans-serif' }}>{step.id}</span>
               )}
             </motion.div>
             <span
-              className={`mt-2 text-xs font-mono whitespace-nowrap ${
-                current >= step.id ? 'text-teal-400' : 'text-slate-600'
-              }`}
+              className="mt-2 text-xs whitespace-nowrap"
+              style={{
+                fontFamily: 'Instrument Sans, sans-serif',
+                fontWeight: 500,
+                color: current >= step.id ? '#FC5D36' : '#9ca3af',
+              }}
             >
               {step.label}
             </span>
           </div>
           {i < steps.length - 1 && (
             <div
-              className={`h-0.5 w-16 mx-2 mb-5 transition-colors ${
-                current > step.id + 0 ? 'bg-teal-500' : 'bg-slate-700'
-              }`}
+              className="h-0.5 w-16 mx-2 mb-5 transition-colors"
+              style={{ background: current > step.id ? '#FC5D36' : '#e5e7eb' }}
             />
           )}
         </div>

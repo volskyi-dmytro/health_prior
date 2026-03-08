@@ -13,6 +13,10 @@ interface Props {
 export function Step3_CoverageDecision({ coverageResult, onNext, loading }: Props) {
   const confidencePct = Math.round(coverageResult.confidence_score * 100);
 
+  const barColor =
+    coverageResult.decision === 'APPROVED' ? '#16a34a' :
+    coverageResult.decision === 'DENIED' ? '#FC5D36' : '#FDB352';
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -22,11 +26,20 @@ export function Step3_CoverageDecision({ coverageResult, onNext, loading }: Prop
       className="max-w-3xl mx-auto"
     >
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-teal-500/10 border border-teal-500/30 mb-4">
-          <Shield className="w-7 h-7 text-teal-400" />
+        <div
+          className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4"
+          style={{ background: 'rgba(252,93,54,0.08)', border: '1px solid rgba(252,93,54,0.25)' }}
+        >
+          <Shield className="w-7 h-7" style={{ color: '#FC5D36' }} />
         </div>
-        <h2 className="text-2xl font-display text-white mb-2">Coverage Decision</h2>
-        <p className="text-slate-400 text-sm">Molina Healthcare MCR-621 — Lumbar Spine MRI</p>
+        <h2
+          style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '28px', color: '#000', marginBottom: '8px' }}
+        >
+          Coverage Decision
+        </h2>
+        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: '#6b7280' }}>
+          Molina Healthcare MCR-621 — Lumbar Spine MRI
+        </p>
       </div>
 
       {/* Decision badge */}
@@ -37,24 +50,29 @@ export function Step3_CoverageDecision({ coverageResult, onNext, loading }: Prop
       {/* Confidence score */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">Confidence Score</span>
-          <span className="text-sm font-mono text-teal-400">{confidencePct}%</span>
+          <span
+            className="uppercase tracking-wider"
+            style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af' }}
+          >
+            Confidence Score
+          </span>
+          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', fontWeight: 600, color: barColor }}>
+            {confidencePct}%
+          </span>
         </div>
-        <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+        <div className="h-2 rounded-full overflow-hidden" style={{ background: '#f3f4f6' }}>
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${confidencePct}%` }}
             transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
-            className={`h-full rounded-full ${
-              coverageResult.decision === 'APPROVED' ? 'bg-teal-500' :
-              coverageResult.decision === 'DENIED' ? 'bg-red-500' : 'bg-amber-500'
-            }`}
+            className="h-full rounded-full"
+            style={{ background: barColor }}
           />
         </div>
       </div>
 
       {/* Criteria checklist */}
-      <div className="bg-slate-900/50 rounded-xl border border-slate-700 p-5 mb-6">
+      <div className="rounded-xl p-5 mb-6" style={{ background: '#FFFFFF', border: '1px solid #e5e7eb' }}>
         <CriteriaChecklist
           matchedCriteria={coverageResult.matched_criteria}
           unmetCriteria={coverageResult.unmet_criteria}
@@ -62,11 +80,16 @@ export function Step3_CoverageDecision({ coverageResult, onNext, loading }: Prop
       </div>
 
       {/* LLM Justification */}
-      <div className="bg-slate-900/50 rounded-xl border border-slate-700 p-5 mb-6">
-        <h3 className="text-xs font-mono text-slate-400 uppercase tracking-wider mb-3">
+      <div className="rounded-xl p-5 mb-6" style={{ background: '#FFF6EA', border: '1px solid rgba(253,179,82,0.3)' }}>
+        <h3
+          className="uppercase tracking-wider mb-3"
+          style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af' }}
+        >
           Clinical Justification
         </h3>
-        <p className="text-sm text-slate-300 leading-relaxed">{coverageResult.justification}</p>
+        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#363636', lineHeight: 1.7 }}>
+          {coverageResult.justification}
+        </p>
       </div>
 
       <div className="flex justify-center">
@@ -75,7 +98,7 @@ export function Step3_CoverageDecision({ coverageResult, onNext, loading }: Prop
           disabled={loading}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="flex items-center gap-2 px-8 py-3 bg-teal-500 hover:bg-teal-400 disabled:bg-slate-700 text-navy-900 font-semibold rounded-lg transition-all shadow-[0_0_20px_rgba(45,212,191,0.3)]"
+          className="btn-primary flex items-center gap-2"
         >
           {loading ? 'Generating...' : (
             <>Generate Prior Auth Package <ChevronRight className="w-4 h-4" /></>
