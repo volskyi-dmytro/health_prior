@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Stethoscope, ChevronRight, Cpu } from 'lucide-react';
-import { getSampleNotes } from '../api/healthprior';
-import type { SampleNote } from '../types';
+import { Stethoscope, ChevronRight, Cpu, GitCompare, FileText } from 'lucide-react';
+import { getSampleNotes, getPolicies } from '../api/healthprior';
+import type { SampleNote, Policy } from '../types';
 
 const MODELS = [
   { value: 'anthropic/claude-3.5-sonnet', label: 'Claude 3.5 Sonnet' },
@@ -12,23 +12,38 @@ const MODELS = [
 ];
 
 interface Props {
-  onSubmit: (note: string, model: string) => void;
+  onSubmit: (note: string, model: string, policyId: string, modelB?: string) => void;
   loading: boolean;
 }
 
 export function Step1_NoteInput({ onSubmit, loading }: Props) {
   const [note, setNote] = useState('');
   const [model, setModel] = useState(MODELS[0].value);
+  const [modelB, setModelB] = useState(MODELS[1].value);
+  const [compareMode, setCompareMode] = useState(false);
   const [samples, setSamples] = useState<SampleNote[]>([]);
+  const [policies, setPolicies] = useState<Policy[]>([]);
+  const [policyId, setPolicyId] = useState('MCR-621');
 
   useEffect(() => {
     getSampleNotes().then(setSamples).catch(console.error);
+    getPolicies()
+      .then(setPolicies)
+      .catch(() => {
+        // fallback default policy
+        setPolicies([{ id: 'MCR-621', name: 'Molina MCR-621: Lumbar Spine MRI' }]);
+      });
   }, []);
 
   const decisionStyle = (d: string) => {
     if (d === 'APPROVED') return { color: '#16a34a', background: 'rgba(34,197,94,0.1)', padding: '2px 8px', borderRadius: '100px' };
     if (d === 'DENIED') return { color: '#FC5D36', background: 'rgba(252,93,54,0.1)', padding: '2px 8px', borderRadius: '100px' };
     return { color: '#d97706', background: 'rgba(253,179,82,0.15)', padding: '2px 8px', borderRadius: '100px' };
+  };
+
+  const handleSubmit = () => {
+    if (!note.trim()) return;
+    onSubmit(note, model, policyId, compareMode ? modelB : undefined);
   };
 
   return (
@@ -54,6 +69,40 @@ export function Step1_NoteInput({ onSubmit, loading }: Props) {
         <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: '#6b7280' }}>
           Paste a clinical note or select a sample to begin prior authorization analysis
         </p>
+      </div>
+
+      {/* Policy Selector */}
+      <div className="rounded-xl p-4 mb-4" style={{ background: '#FFFFFF', border: '1px solid #e5e7eb' }}>
+        <div className="flex items-center gap-2 mb-2">
+          <FileText className="w-4 h-4" style={{ color: '#9ca3af' }} />
+          <span
+            className="uppercase tracking-wider"
+            style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af' }}
+          >
+            Coverage Policy
+          </span>
+        </div>
+        <select
+          value={policyId}
+          onChange={(e) => setPolicyId(e.target.value)}
+          className="w-full rounded-lg px-3 py-2 focus:outline-none transition-all"
+          style={{
+            fontFamily: 'Instrument Sans, sans-serif',
+            fontSize: '14px',
+            color: '#363636',
+            background: '#FAF9F5',
+            border: '1px solid #e5e7eb',
+          }}
+          onFocus={e => { e.currentTarget.style.borderColor = 'rgba(252,93,54,0.5)'; }}
+          onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb'; }}
+        >
+          {policies.length === 0 && (
+            <option value="MCR-621">Molina MCR-621: Lumbar Spine MRI</option>
+          )}
+          {policies.map((p) => (
+            <option key={p.id} value={p.id}>{p.name}</option>
+          ))}
+        </select>
       </div>
 
       {/* Sample note buttons */}
@@ -123,10 +172,34 @@ export function Step1_NoteInput({ onSubmit, loading }: Props) {
         onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.boxShadow = 'none'; }}
       />
 
+      {/* Compare models toggle */}
+      <div className="flex items-center gap-3 mt-3 mb-3">
+        <button
+          onClick={() => setCompareMode(!compareMode)}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all"
+          style={{
+            fontFamily: 'Instrument Sans, sans-serif',
+            fontSize: '13px',
+            fontWeight: 500,
+            border: compareMode ? '1px solid rgba(252,93,54,0.5)' : '1px solid #e5e7eb',
+            background: compareMode ? 'rgba(252,93,54,0.08)' : '#FFFFFF',
+            color: compareMode ? '#FC5D36' : '#6b7280',
+          }}
+        >
+          <GitCompare className="w-3.5 h-3.5" />
+          Compare Models
+        </button>
+        {compareMode && (
+          <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#9ca3af' }}>
+            Side-by-side FHIR extraction comparison
+          </span>
+        )}
+      </div>
+
       {/* Model picker + submit */}
-      <div className="flex items-center gap-3 mt-4">
+      <div className="flex items-center gap-3 mt-2">
         <div className="flex items-center gap-2 flex-1">
-          <Cpu className="w-4 h-4" style={{ color: '#9ca3af' }} />
+          <Cpu className="w-4 h-4 flex-shrink-0" style={{ color: '#9ca3af' }} />
           <select
             value={model}
             onChange={(e) => setModel(e.target.value)}
@@ -143,10 +216,31 @@ export function Step1_NoteInput({ onSubmit, loading }: Props) {
               <option key={m.value} value={m.value}>{m.label}</option>
             ))}
           </select>
+          {compareMode && (
+            <>
+              <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#9ca3af' }}>vs</span>
+              <select
+                value={modelB}
+                onChange={(e) => setModelB(e.target.value)}
+                className="rounded-[100px] px-4 py-2 focus:outline-none flex-1 transition-all"
+                style={{
+                  fontFamily: 'Instrument Sans, sans-serif',
+                  fontSize: '14px',
+                  color: '#363636',
+                  background: '#FFFFFF',
+                  border: '1px solid #e5e7eb',
+                }}
+              >
+                {MODELS.map((m) => (
+                  <option key={m.value} value={m.value}>{m.label}</option>
+                ))}
+              </select>
+            </>
+          )}
         </div>
 
         <motion.button
-          onClick={() => note.trim() && onSubmit(note, model)}
+          onClick={handleSubmit}
           disabled={!note.trim() || loading}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}

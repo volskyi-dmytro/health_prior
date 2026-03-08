@@ -1,5 +1,7 @@
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
+export { API_BASE };
+
 async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
   const response = await fetch(url, {
     headers: { 'Content-Type': 'application/json' },
@@ -15,11 +17,20 @@ async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
 export const getSampleNotes = () =>
   fetchJSON<import('../types').SampleNote[]>(`${API_BASE}/notes/samples`);
 
-export const structureNote = (note: string, model?: string) =>
+export const structureNote = (note: string, model?: string, policy_id?: string) =>
   fetchJSON<{ fhir_bundle: import('../types').FHIRBundle; raw_note: string; model_used: string }>(
     `${API_BASE}/notes/structure`,
-    { method: 'POST', body: JSON.stringify({ note, model }) }
+    { method: 'POST', body: JSON.stringify({ note, model, policy_id }) }
   );
+
+export const getPolicies = () =>
+  fetchJSON<Array<{ id: string; name: string; description?: string }>>(`${API_BASE}/policies`);
+
+export const getSubmissionAudit = (id: string) =>
+  fetchJSON<import('../types').AuditTrail>(`${API_BASE}/submissions/${id}/audit`);
+
+export const getPriorAuthPdfUrl = (submission_id: string) =>
+  `${API_BASE}/prior-auth/${submission_id}/pdf`;
 
 export const evaluateCoverage = (
   fhir_bundle: import('../types').FHIRBundle,

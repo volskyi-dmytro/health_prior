@@ -79,8 +79,11 @@ async def test_structure_note_calls_mcp_and_llm(client):
     }
     mock_mcp = {"policy_id": "MCR-621", "coverage_criteria": []}
 
+    from app.services.llm_service import LLMCallResult
+    mock_meta = LLMCallResult(content="", prompt_tokens=10, completion_tokens=10, latency_ms=100)
     with patch("app.api.notes.MCPClient.get_coverage_criteria", new_callable=AsyncMock, return_value=mock_mcp), \
-         patch("app.api.notes.FHIRService.structure_note", new_callable=AsyncMock, return_value=FHIRBundle(**mock_fhir)):
+         patch("app.api.notes.LLMService.structure_note_retry", new_callable=AsyncMock, return_value=(mock_fhir, mock_meta)), \
+         patch("app.api.notes.log_llm_call", new_callable=AsyncMock):
         response = await client.post("/notes/structure", json={"note": "Patient with low back pain x 8 weeks."})
 
     assert response.status_code == 200
@@ -113,8 +116,11 @@ async def test_coverage_evaluation(client):
         "confidence_score": 0.9
     }
 
-    with patch("app.api.coverage.CoverageService.evaluate", new_callable=AsyncMock,
-               return_value=CoverageResult(**mock_result, policy_id="MCR-621")):
+    from app.services.llm_service import LLMCallResult
+    mock_meta = LLMCallResult(content="", prompt_tokens=10, completion_tokens=10, latency_ms=100)
+    with patch("app.api.coverage.CoverageService.evaluate_with_meta", new_callable=AsyncMock,
+               return_value=(CoverageResult(**mock_result, policy_id="MCR-621"), mock_meta)), \
+         patch("app.api.coverage.log_llm_call", new_callable=AsyncMock):
         response = await client.post("/coverage/evaluate", json={
             "fhir_bundle": fhir_bundle,
             "raw_note": "Clinical note text",

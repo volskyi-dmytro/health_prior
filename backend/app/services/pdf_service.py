@@ -1,0 +1,151 @@
+"""
+PDF generation for prior auth letters using ReportLab.
+"""
+import io
+from datetime import datetime, timezone
+
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.lib import colors
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Table,
+    TableStyle,
+    HRFlowable,
+)
+
+
+def generate_prior_auth_pdf(prior_auth: dict) -> bytes:
+    """Generate a PDF prior authorization letter from a PriorAuthPackage dict.
+
+    Returns raw PDF bytes.
+    """
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buf,
+        pagesize=letter,
+        rightMargin=inch,
+        leftMargin=inch,
+        topMargin=inch,
+        bottomMargin=inch,
+    )
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        "Title",
+        parent=styles["Heading1"],
+        fontSize=16,
+        spaceAfter=6,
+        textColor=colors.HexColor("#1a365d"),
+    )
+    heading2_style = ParagraphStyle(
+        "Heading2",
+        parent=styles["Heading2"],
+        fontSize=12,
+        spaceAfter=4,
+        textColor=colors.HexColor("#2c5282"),
+    )
+    normal = styles["Normal"]
+    body = ParagraphStyle("Body", parent=normal, fontSize=10, spaceAfter=4, leading=14)
+    label = ParagraphStyle("Label", parent=body, fontName="Helvetica-Bold")
+
+    story = []
+
+    # Header
+    story.append(Paragraph("HealthPrior — Prior Authorization Letter", title_style))
+    story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor("#2c5282")))
+    story.append(Spacer(1, 0.15 * inch))
+
+    # Submission metadata
+    ts = prior_auth.get("timestamp", datetime.now(timezone.utc).isoformat())
+    story.append(Paragraph(f"<b>Submission ID:</b> {prior_auth.get('submission_id', 'N/A')}", body))
+    story.append(Paragraph(f"<b>Date:</b> {ts[:10]}", body))
+    decision = prior_auth.get("coverage_decision", "N/A")
+    decision_color = "#276749" if decision == "APPROVED" else "#9b2335" if decision == "DENIED" else "#744210"
+    story.append(
+        Paragraph(
+            f'<b>Decision:</b> <font color="{decision_color}"><b>{decision}</b></font>',
+            body,
+        )
+    )
+    story.append(Spacer(1, 0.1 * inch))
+
+    # Patient information
+    story.append(Paragraph("Patient Information", heading2_style))
+    patient = prior_auth.get("patient", {})
+    patient_data = [
+        ["Name", patient.get("name", "Unknown")],
+        ["DOB", patient.get("dob", "Unknown")],
+        ["MRN", patient.get("mrn", "N/A")],
+        ["Gender", patient.get("gender", "Unknown")],
+    ]
+    pt = Table(patient_data, colWidths=[1.5 * inch, 4.5 * inch])
+    pt.setStyle(
+        TableStyle(
+            [
+                ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, -1), 10),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("ROWBACKGROUNDS", (0, 0), (-1, -1), [colors.white, colors.HexColor("#f7fafc")]),
+            ]
+        )
+    )
+    story.append(pt)
+    story.append(Spacer(1, 0.1 * inch))
+
+    # Requested service
+    story.append(Paragraph("Requested Service", heading2_style))
+    svc = prior_auth.get("requested_service", {})
+    svc_data = [
+        ["Procedure", svc.get("procedure_name", "N/A")],
+        ["CPT Code", svc.get("cpt_code", "N/A")],
+        ["ICD-10 Codes", ", ".join(svc.get("icd10_codes", []))],
+        ["Payer Policy", svc.get("payer_policy", "N/A")],
+    ]
+    st = Table(svc_data, colWidths=[1.5 * inch, 4.5 * inch])
+    st.setStyle(
+        TableStyle(
+            [
+                ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, -1), 10),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("ROWBACKGROUNDS", (0, 0), (-1, -1), [colors.white, colors.HexColor("#f7fafc")]),
+            ]
+        )
+    )
+    story.append(st)
+    story.append(Spacer(1, 0.1 * inch))
+
+    # Supporting criteria
+    supporting = prior_auth.get("supporting_criteria", [])
+    if supporting:
+        story.append(Paragraph("Supporting Criteria Met", heading2_style))
+        for criterion in supporting:
+            story.append(Paragraph(f"• {criterion}", body))
+        story.append(Spacer(1, 0.1 * inch))
+
+    # Clinical justification
+    story.append(Paragraph("Clinical Justification", heading2_style))
+    justification = prior_auth.get("clinical_justification", "No justification provided.")
+    for para in justification.split("\n\n"):
+        if para.strip():
+            story.append(Paragraph(para.strip(), body))
+    story.append(Spacer(1, 0.15 * inch))
+
+    # Footer
+    story.append(HRFlowable(width="100%", thickness=0.5, color=colors.grey))
+    story.append(
+        Paragraph(
+            "This document was generated by HealthPrior, a clinical AI prototype. "
+            "It is not a final coverage determination and must be reviewed by a licensed clinician.",
+            ParagraphStyle("Footer", parent=normal, fontSize=8, textColor=colors.grey),
+        )
+    )
+
+    doc.build(story)
+    return buf.getvalue()

@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api import notes, coverage, prior_auth
+from app.api import notes, coverage, prior_auth, policies
 from app.auth.router import router as auth_router
 from app.auth.session import require_auth
 
@@ -38,6 +38,7 @@ app.include_router(auth_router)
 app.include_router(notes.router, dependencies=[Depends(require_auth)])
 app.include_router(coverage.router, dependencies=[Depends(require_auth)])
 app.include_router(prior_auth.router, dependencies=[Depends(require_auth)])
+app.include_router(policies.router, dependencies=[Depends(require_auth)])
 
 
 @app.get("/health")

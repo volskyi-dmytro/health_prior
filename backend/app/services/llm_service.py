@@ -1,6 +1,7 @@
 import asyncio
 import httpx
 import json
+import time
 from typing import Any
 from app.core.config import settings
 
@@ -76,15 +77,32 @@ Decision rules:
 
 Return ONLY valid JSON."""
 
+FHIR_RETRY_CLARIFICATION = """The previous extraction was missing required fields. Please re-extract FHIR resources and ensure:
+- Every Condition has: resourceType, code, clinicalStatus, _sourceRef
+- Every MedicationRequest has: resourceType, medication, status, _sourceRef
+- Every Observation has: resourceType, code, valueString, status, _sourceRef
+
+The _sourceRef field must contain the exact section name from the clinical note where the finding was documented."""
+
+
+class LLMCallResult:
+    """Wraps an LLM response with metadata for audit logging."""
+    def __init__(self, content: str, prompt_tokens: int | None, completion_tokens: int | None, latency_ms: int):
+        self.content = content
+        self.prompt_tokens = prompt_tokens
+        self.completion_tokens = completion_tokens
+        self.latency_ms = latency_ms
+
 
 class LLMService:
     def __init__(self, api_key: str | None = None, model: str | None = None):
         self.api_key = api_key or settings.OPENROUTER_API_KEY
         self.model = model or settings.DEFAULT_MODEL
 
-    async def complete(self, system: str, user: str, retries: int = 3) -> str:
-        """Call OpenRouter LLM with retry on rate limit."""
+    async def complete_with_meta(self, system: str, user: str, retries: int = 3) -> LLMCallResult:
+        """Call OpenRouter LLM with retry on rate limit. Returns content + token usage + latency."""
         for attempt in range(retries):
+            t0 = time.monotonic()
             try:
                 async with httpx.AsyncClient(timeout=90.0) as client:
                     response = await client.post(
@@ -105,7 +123,15 @@ class LLMService:
                         },
                     )
                     response.raise_for_status()
-                    return response.json()["choices"][0]["message"]["content"]
+                    latency_ms = int((time.monotonic() - t0) * 1000)
+                    data = response.json()
+                    usage = data.get("usage", {})
+                    return LLMCallResult(
+                        content=data["choices"][0]["message"]["content"],
+                        prompt_tokens=usage.get("prompt_tokens"),
+                        completion_tokens=usage.get("completion_tokens"),
+                        latency_ms=latency_ms,
+                    )
             except httpx.HTTPStatusError as e:
                 if e.response.status_code == 429 and attempt < retries - 1:
                     wait = 2 ** attempt
@@ -115,13 +141,29 @@ class LLMService:
 
         raise RuntimeError("LLM service failed after retries")
 
-    async def structure_note(self, raw_note: str, mcp_context: dict | None = None) -> dict:
+    async def complete(self, system: str, user: str, retries: int = 3) -> str:
+        """Call OpenRouter LLM with retry on rate limit."""
+        result = await self.complete_with_meta(system, user, retries)
+        return result.content
+
+    def _parse_json(self, result_str: str) -> dict:
+        result_str = result_str.strip()
+        if result_str.startswith("```"):
+            result_str = result_str.split("```")[1]
+            if result_str.startswith("json"):
+                result_str = result_str[4:]
+        return json.loads(result_str.strip())
+
+    async def structure_note(
+        self,
+        raw_note: str,
+        mcp_context: dict | None = None,
+    ) -> dict:
         """Structure a clinical note into FHIR resources.
 
         Calls MCP server for guideline context before prompting LLM.
         Returns FHIRBundle-compatible dict.
         """
-        # Get MCP context to enrich the prompt
         context_str = ""
         if mcp_context:
             context_str = f"\n\nCoverage criteria context from MCP server:\n{json.dumps(mcp_context, indent=2)}"
@@ -132,16 +174,59 @@ CLINICAL NOTE:
 {raw_note}"""
 
         result_str = await self.complete(FHIR_EXTRACTION_SYSTEM, user_prompt)
+        return self._parse_json(result_str)
 
-        # Clean JSON from markdown fences if present
-        result_str = result_str.strip()
-        if result_str.startswith("```"):
-            result_str = result_str.split("```")[1]
-            if result_str.startswith("json"):
-                result_str = result_str[4:]
-        result_str = result_str.strip()
+    async def structure_note_with_meta(
+        self,
+        raw_note: str,
+        mcp_context: dict | None = None,
+    ) -> tuple[dict, LLMCallResult]:
+        """Like structure_note but also returns the raw LLMCallResult for audit logging."""
+        context_str = ""
+        if mcp_context:
+            context_str = f"\n\nCoverage criteria context from MCP server:\n{json.dumps(mcp_context, indent=2)}"
 
-        return json.loads(result_str)
+        user_prompt = f"""Extract FHIR resources from this clinical note:{context_str}
+
+CLINICAL NOTE:
+{raw_note}"""
+
+        meta = await self.complete_with_meta(FHIR_EXTRACTION_SYSTEM, user_prompt)
+        bundle = self._parse_json(meta.content)
+        return bundle, meta
+
+    async def structure_note_retry(
+        self,
+        raw_note: str,
+        mcp_context: dict | None = None,
+    ) -> tuple[dict, LLMCallResult]:
+        """Structure note with one automatic retry if FHIR validation fails.
+
+        Returns (bundle_dict, last_llm_meta).
+        """
+        from app.services.fhir_validator import validate_fhir_bundle
+
+        bundle, meta = await self.structure_note_with_meta(raw_note, mcp_context)
+        is_valid, errors = validate_fhir_bundle(bundle)
+        if not is_valid:
+            # Retry with clarifying prompt
+            context_str = ""
+            if mcp_context:
+                context_str = f"\n\nCoverage criteria context:\n{json.dumps(mcp_context, indent=2)}"
+
+            retry_prompt = f"""{FHIR_RETRY_CLARIFICATION}
+
+Validation errors from previous attempt:
+{chr(10).join(errors)}
+
+{context_str}
+
+CLINICAL NOTE:
+{raw_note}"""
+            meta = await self.complete_with_meta(FHIR_EXTRACTION_SYSTEM, retry_prompt)
+            bundle = self._parse_json(meta.content)
+
+        return bundle, meta
 
     async def evaluate_coverage(self, fhir_bundle: dict, policy_criteria: dict) -> dict:
         """Compare FHIR patient data against coverage criteria.
@@ -157,12 +242,18 @@ Molina MCR-621 Coverage Criteria:
 Evaluate coverage and return JSON decision."""
 
         result_str = await self.complete(COVERAGE_EVALUATION_SYSTEM, user_prompt)
+        return self._parse_json(result_str)
 
-        result_str = result_str.strip()
-        if result_str.startswith("```"):
-            result_str = result_str.split("```")[1]
-            if result_str.startswith("json"):
-                result_str = result_str[4:]
-        result_str = result_str.strip()
+    async def evaluate_coverage_with_meta(self, fhir_bundle: dict, policy_criteria: dict) -> tuple[dict, LLMCallResult]:
+        """Like evaluate_coverage but returns (result_dict, meta)."""
+        user_prompt = f"""Patient FHIR Bundle:
+{json.dumps(fhir_bundle, indent=2)}
 
-        return json.loads(result_str)
+Molina MCR-621 Coverage Criteria:
+{json.dumps(policy_criteria, indent=2)}
+
+Evaluate coverage and return JSON decision."""
+
+        meta = await self.complete_with_meta(COVERAGE_EVALUATION_SYSTEM, user_prompt)
+        result_dict = self._parse_json(meta.content)
+        return result_dict, meta

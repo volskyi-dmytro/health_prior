@@ -75,3 +75,27 @@ export interface SampleNote {
 }
 
 export type WizardStep = 1 | 2 | 3 | 4;
+
+export interface Policy {
+  id: string;
+  name: string;
+  description?: string;
+}
+
+export interface AuditTrailEntry {
+  step: string;
+  model?: string;
+  tool?: string;
+  input_tokens?: number;
+  output_tokens?: number;
+  latency_ms?: number;
+  timestamp?: string;
+  [key: string]: unknown;
+}
+
+export interface AuditTrail {
+  submission_id: string;
+  entries: AuditTrailEntry[];
+  total_tokens?: number;
+  total_latency_ms?: number;
+}
