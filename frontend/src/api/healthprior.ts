@@ -45,3 +45,16 @@ export const getSubmissionHistory = () =>
   fetchJSON<Array<{ id: string; created_at: string; decision: string | null; raw_note_preview: string }>>(
     `${API_BASE}/prior-auth/history`
   );
+
+export interface AuthUser {
+  authenticated: boolean;
+  login?: string;
+  avatar_url?: string;
+  email?: string;
+}
+
+export const getMe = () =>
+  fetchJSON<AuthUser>(`${API_BASE}/auth/me`).catch(() => ({ authenticated: false } as AuthUser));
+
+export const loginUrl = () => `${API_BASE}/auth/github`;
+export const logoutUrl = () => `${API_BASE}/auth/logout`;
