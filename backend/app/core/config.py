@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     CORS_ORIGINS: str = "https://healthprior.volskyi-dmytro.com,http://localhost:3000,http://localhost:3100"
     MCP_SERVER_URL: str = "http://mcp-server:8001"
     TESTING: bool = False
+    GITHUB_OAUTH_CLIENT_ID: str = ""
+    GITHUB_OAUTH_CLIENT_SECRET: str = ""
+    SESSION_SECRET_KEY: str = "dev-insecure-key-change-in-production"
+    ADMIN_GITHUB_EMAIL: str = ""
 
     @property
     def CORS_ORIGINS_LIST(self) -> List[str]:

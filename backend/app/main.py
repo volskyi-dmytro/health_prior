@@ -1,8 +1,10 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api import notes, coverage, prior_auth
+from app.auth.router import router as auth_router
+from app.auth.session import require_auth
 
 
 @asynccontextmanager
@@ -29,10 +31,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(notes.router)
-app.include_router(coverage.router)
-app.include_router(prior_auth.router)
+# Auth router — unprotected
+app.include_router(auth_router)
+
+# Protected routers
+app.include_router(notes.router, dependencies=[Depends(require_auth)])
+app.include_router(coverage.router, dependencies=[Depends(require_auth)])
+app.include_router(prior_auth.router, dependencies=[Depends(require_auth)])
 
 
 @app.get("/health")
