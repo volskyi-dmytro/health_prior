@@ -9,8 +9,8 @@ import { Step2_FHIRStructuring } from './steps/Step2_FHIRStructuring';
 import { Step3_CoverageDecision } from './steps/Step3_CoverageDecision';
 import { Step4_PriorAuth } from './steps/Step4_PriorAuth';
 import { HistoryPage } from './pages/HistoryPage';
-import { structureNote, evaluateCoverage, generatePriorAuth, API_BASE } from './api/healthprior';
-import type { WizardStep, FHIRBundle, CoverageResult, PriorAuthPackage } from './types';
+import { structureNote, evaluateCoverage, generatePriorAuth, pollCoverageTask, submitCoverageReply, API_BASE } from './api/healthprior';
+import type { WizardStep, FHIRBundle, CoverageResult, PriorAuthPackage, A2ADataPart, A2ATextPart } from './types';
 
 function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
   const location = useLocation();
@@ -48,6 +48,9 @@ function WizardApp() {
   const [priorAuth, setPriorAuth] = useState<PriorAuthPackage | null>(null);
   const [streamedResources, setStreamedResources] = useState<import('./types').FHIRResource[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [a2aTaskId, setA2ATaskId] = useState<string | null>(null);
+  const [payerQuestion, setPayerQuestion] = useState<string | null>(null);
+  const [payerCriterion, setPayerCriterion] = useState<string | null>(null);
 
   const handleStructureNote = async (note: string, model: string, policyId: string, modelB?: string) => {
     setLoading(true);
@@ -139,18 +142,74 @@ function WizardApp() {
     }
   };
 
+  const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+
+  const pollUntilDone = async (task_id: string) => {
+    const MAX_POLLS = 60; // 90 seconds max
+    for (let i = 0; i < MAX_POLLS; i++) {
+      await sleep(1500);
+      const task = await pollCoverageTask(task_id);
+      const state = task.status.state;
+
+      if (state === 'input-required') {
+        const msg = task.status.message;
+        const dataPart = msg?.parts.find(p => p.type === 'data') as A2ADataPart | undefined;
+        const textPart = msg?.parts.find(p => p.type === 'text') as A2ATextPart | undefined;
+        const question = (dataPart?.data as Record<string, unknown>)?.question as string
+          || textPart?.text
+          || 'Additional information required';
+        const criterion = (dataPart?.data as Record<string, unknown>)?.criterion_at_stake as string | undefined;
+        setPayerQuestion(question);
+        setPayerCriterion(criterion ?? null);
+        setLoading(false);
+        return;
+      }
+
+      if (state === 'completed') {
+        const msg = task.status.message;
+        const dataPart = msg?.parts.find(p => p.type === 'data') as A2ADataPart | undefined;
+        if (dataPart?.data) {
+          setCoverageResult(dataPart.data as unknown as CoverageResult);
+        }
+        setLoading(false);
+        return;
+      }
+
+      if (state === 'failed') {
+        throw new Error('Payer agent evaluation failed');
+      }
+      // 'submitted' or 'working' — keep polling
+    }
+    throw new Error('Coverage evaluation timed out');
+  };
+
   const handleEvaluateCoverage = async () => {
     if (!fhirBundle) return;
     setLoading(true);
     setError(null);
     try {
-      const result = await evaluateCoverage(fhirBundle, rawNote, 'MCR-621', sessionId);
-      setCoverageResult(result);
+      const { task_id } = await evaluateCoverage(fhirBundle, rawNote, 'MCR-621', sessionId);
+      setA2ATaskId(task_id);
       setStep(3);
+      await pollUntilDone(task_id);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to evaluate coverage');
+      setError(e instanceof Error ? e.message : 'Coverage evaluation failed');
+      setLoading(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } finally {
+    }
+  };
+
+  const handleSubmitPayerReply = async (answer: string) => {
+    if (!a2aTaskId) return;
+    setLoading(true);
+    setError(null);
+    setPayerQuestion(null);
+    setPayerCriterion(null);
+    try {
+      await submitCoverageReply(a2aTaskId, answer);
+      await pollUntilDone(a2aTaskId);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to submit reply');
       setLoading(false);
     }
   };
@@ -182,6 +241,9 @@ function WizardApp() {
     setError(null);
     setStreamedResources([]);
     setIsStreaming(false);
+    setA2ATaskId(null);
+    setPayerQuestion(null);
+    setPayerCriterion(null);
   };
 
   // Build a partial bundle for streaming display
@@ -210,8 +272,8 @@ function WizardApp() {
       )}
 
       {loading && step === 1 && !isStreaming && <LoadingSpinner message="Calling MCP server + structuring note with LLM..." />}
-      {loading && step === 2 && <LoadingSpinner message="Evaluating against Molina MCR-621 criteria..." />}
-      {loading && step === 3 && <LoadingSpinner message="Generating prior auth package..." />}
+      {loading && step === 3 && !coverageResult && <LoadingSpinner message="Evaluating against Molina MCR-621 criteria..." />}
+      {loading && step === 3 && coverageResult && <LoadingSpinner message="Generating prior auth package..." />}
 
       {/* Show streaming progress on step 1 */}
       {isStreaming && streamingBundle && (
@@ -243,11 +305,15 @@ function WizardApp() {
                 loading={loading}
               />
             )}
-            {step === 3 && coverageResult && (
+            {step === 3 && (coverageResult || payerQuestion) && (
               <Step3_CoverageDecision
-                coverageResult={coverageResult}
+                coverageResult={coverageResult!}
                 onNext={handleGeneratePriorAuth}
                 loading={loading}
+                payerQuestion={payerQuestion ?? undefined}
+                payerCriterion={payerCriterion ?? undefined}
+                onSubmitPayerReply={handleSubmitPayerReply}
+                isLoading={loading}
               />
             )}
             {step === 4 && priorAuth && (

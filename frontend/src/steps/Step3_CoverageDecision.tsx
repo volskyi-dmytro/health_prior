@@ -2,15 +2,56 @@ import { motion } from 'framer-motion';
 import { Shield, ChevronRight } from 'lucide-react';
 import { DecisionBadge } from '../components/DecisionBadge';
 import { CriteriaChecklist } from '../components/CriteriaChecklist';
+import { PayerQuestion } from '../components/PayerQuestion';
 import type { CoverageResult } from '../types';
 
 interface Props {
   coverageResult: CoverageResult;
   onNext: () => void;
   loading: boolean;
+  payerQuestion?: string;
+  payerCriterion?: string;
+  onSubmitPayerReply?: (answer: string) => void;
+  isLoading?: boolean;
 }
 
-export function Step3_CoverageDecision({ coverageResult, onNext, loading }: Props) {
+export function Step3_CoverageDecision({ coverageResult, onNext, loading, payerQuestion, payerCriterion, onSubmitPayerReply, isLoading }: Props) {
+  // While waiting for payer clarification (no result yet), show the question prompt
+  if (payerQuestion && !coverageResult) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.4 }}
+        className="max-w-3xl mx-auto"
+      >
+        <div className="text-center mb-8">
+          <div
+            className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4"
+            style={{ background: 'rgba(252,93,54,0.08)', border: '1px solid rgba(252,93,54,0.25)' }}
+          >
+            <Shield className="w-7 h-7" style={{ color: '#FC5D36' }} />
+          </div>
+          <h2
+            style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '28px', color: '#000', marginBottom: '8px' }}
+          >
+            Coverage Decision
+          </h2>
+          <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: '#6b7280' }}>
+            Molina Healthcare MCR-621 — Lumbar Spine MRI
+          </p>
+        </div>
+        <PayerQuestion
+          question={payerQuestion}
+          criterionAtStake={payerCriterion}
+          onSubmit={onSubmitPayerReply ?? (() => {})}
+          isLoading={isLoading ?? false}
+        />
+      </motion.div>
+    );
+  }
+
   const confidencePct = Math.round(coverageResult.confidence_score * 100);
 
   const barColor =

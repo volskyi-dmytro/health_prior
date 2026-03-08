@@ -39,9 +39,18 @@ export const evaluateCoverage = (
   policy_id = 'MCR-621',
   session_id?: string
 ) =>
-  fetchJSON<import('../types').CoverageResult>(`${API_BASE}/coverage/evaluate`, {
+  fetchJSON<import('../types').CoverageTaskStarted>(`${API_BASE}/coverage/evaluate`, {
     method: 'POST',
     body: JSON.stringify({ fhir_bundle, raw_note, policy_id, session_id }),
+  });
+
+export const pollCoverageTask = (task_id: string) =>
+  fetchJSON<import('../types').A2ATask>(`${API_BASE}/coverage/tasks/${task_id}`);
+
+export const submitCoverageReply = (task_id: string, answer: string) =>
+  fetchJSON<import('../types').A2ATask>(`${API_BASE}/coverage/tasks/${task_id}/reply`, {
+    method: 'POST',
+    body: JSON.stringify({ answer }),
   });
 
 export const generatePriorAuth = (

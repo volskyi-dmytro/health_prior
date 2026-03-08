@@ -1,45 +1,75 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Any
 
 from app.db.database import get_db
-from app.models.schemas import CoverageEvaluationRequest, CoverageResult
-from app.services.llm_service import LLMService
-from app.services.coverage_service import CoverageService
+from app.models.schemas import CoverageEvaluationRequest
+from app.models.a2a import Task
+from app.services.a2a_client import A2AClient
 from app.services.audit_service import log_llm_call
 
 router = APIRouter(prefix="/coverage", tags=["coverage"])
 
 
-@router.post("/evaluate", response_model=CoverageResult)
+class TaskReplyRequest(BaseModel):
+    answer: str
+
+
+@router.post("/evaluate", status_code=202)
 async def evaluate_coverage(
     request: CoverageEvaluationRequest,
     db: AsyncSession = Depends(get_db),
-):
+) -> dict[str, Any]:
     """
-    Evaluate FHIR bundle against Molina MCR-621 coverage criteria.
-    Returns coverage decision with matched/unmet criteria and justification.
-    Logs the LLM call in audit_log.
+    Submit FHIR bundle to the Payer Agent for coverage evaluation via A2A protocol.
+    Returns task_id and initial state immediately (HTTP 202). Poll
+    GET /coverage/tasks/{task_id} for results.
     """
-    llm = LLMService()
-    service = CoverageService(llm)
+    client = A2AClient()
 
-    try:
-        result, meta = await service.evaluate_with_meta(request.fhir_bundle, request.policy_id)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=422, detail=f"Coverage evaluation failed: {str(e)}")
+    fhir_bundle_dict = request.fhir_bundle.model_dump(mode="json")
 
-    # Audit log (non-fatal)
+    response = await client.send_task(
+        fhir_bundle=fhir_bundle_dict,
+        policy_id=request.policy_id,
+        session_id=request.session_id,
+    )
+
+    # Audit log — record the A2A task_id in mcp_tools_called since there are
+    # no LLM tokens to record (the actual inference is inside the payer agent).
     await log_llm_call(
         db=db,
         event_type="coverage_evaluated",
-        model_used=llm.model,
-        prompt_tokens=meta.prompt_tokens if meta else None,
-        completion_tokens=meta.completion_tokens if meta else None,
-        latency_ms=meta.latency_ms if meta else None,
-        mcp_tools_called=["get_coverage_criteria"],
+        model_used=None,
+        prompt_tokens=None,
+        completion_tokens=None,
+        latency_ms=None,
+        mcp_tools_called=[f"a2a:task:{response.id}"],
         submission_id=request.session_id,
     )
 
-    return result
+    return {"task_id": response.id, "state": response.status.state}
+
+
+@router.get("/tasks/{task_id}", response_model=Task)
+async def get_coverage_task(task_id: str) -> Task:
+    """
+    Poll the Payer Agent for the current state of a coverage evaluation task.
+    Returns 404 if the task does not exist on the payer agent.
+    """
+    client = A2AClient()
+    return await client.get_task(task_id)
+
+
+@router.post("/tasks/{task_id}/reply", response_model=Task)
+async def reply_to_coverage_task(
+    task_id: str,
+    body: TaskReplyRequest,
+) -> Task:
+    """
+    Submit a user answer to a paused (input-required) coverage evaluation task.
+    Returns the updated Task from the Payer Agent.
+    """
+    client = A2AClient()
+    return await client.reply_to_task(task_id, body.answer)

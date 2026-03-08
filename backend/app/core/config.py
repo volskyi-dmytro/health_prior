@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     APP_ENV: str = "development"
     CORS_ORIGINS: str = "https://healthprior.volskyi-dmytro.com,http://localhost:3000,http://localhost:3100"
     MCP_SERVER_URL: str = "http://mcp-server:8001"
+    PAYER_AGENT_URL: str = "http://payer-agent:8200"
     TESTING: bool = False
     GITHUB_OAUTH_CLIENT_ID: str = ""
     GITHUB_OAUTH_CLIENT_SECRET: str = ""
