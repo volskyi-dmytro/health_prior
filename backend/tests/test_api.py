@@ -9,7 +9,7 @@ os.environ["DATABASE_URL"] = "postgresql+asyncpg://healthprior:testpass@localhos
 
 from app.auth.session import require_auth
 from app.main import app
-from app.models.schemas import FHIRBundle, CoverageResult
+from app.models.schemas import FHIRBundle
 
 app.dependency_overrides[require_auth] = lambda: {"github_login": "test", "is_admin": True}
 
@@ -108,18 +108,13 @@ async def test_coverage_evaluation(client):
             }
         ]
     }
-    mock_result = {
-        "decision": "APPROVED",
-        "matched_criteria": ["neurologic_weakness", "positive_slr"],
-        "unmet_criteria": [],
-        "justification": "Patient demonstrates neurological findings.",
-        "confidence_score": 0.9
-    }
-
-    from app.services.llm_service import LLMCallResult
-    mock_meta = LLMCallResult(content="", prompt_tokens=10, completion_tokens=10, latency_ms=100)
-    with patch("app.api.coverage.CoverageService.evaluate_with_meta", new_callable=AsyncMock,
-               return_value=(CoverageResult(**mock_result, policy_id="MCR-621"), mock_meta)), \
+    from app.models.a2a import TaskStatus, SendTaskResponse
+    mock_response = SendTaskResponse(
+        id="test-task-123",
+        status=TaskStatus(state="submitted"),
+    )
+    with patch("app.api.coverage.A2AClient.send_task", new_callable=AsyncMock,
+               return_value=mock_response), \
          patch("app.api.coverage.log_llm_call", new_callable=AsyncMock):
         response = await client.post("/coverage/evaluate", json={
             "fhir_bundle": fhir_bundle,
@@ -127,11 +122,10 @@ async def test_coverage_evaluation(client):
             "policy_id": "MCR-621"
         })
 
-    assert response.status_code == 200
+    assert response.status_code == 202
     data = response.json()
-    assert data["decision"] == "APPROVED"
-    assert "matched_criteria" in data
-    assert data["confidence_score"] == 0.9
+    assert data["task_id"] == "test-task-123"
+    assert data["state"] == "submitted"
 
 
 @pytest.mark.anyio
