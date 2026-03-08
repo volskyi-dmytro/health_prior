@@ -46,6 +46,10 @@ jobs:
           TESTING: "true"
           DATABASE_URL: postgresql+asyncpg://healthprior:testpass@localhost:5432/healthprior_test
           OPENROUTER_API_KEY: test_key
+          SESSION_SECRET_KEY: test-session-secret-key-32chars!!
+          ADMIN_GITHUB_EMAIL: test@example.com
+          GITHUB_OAUTH_CLIENT_ID: test_client_id
+          GITHUB_OAUTH_CLIENT_SECRET: test_client_secret
         run: cd backend && pytest tests/ -v
 
   build:
