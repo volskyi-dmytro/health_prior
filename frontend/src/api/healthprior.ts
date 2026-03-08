@@ -64,6 +64,12 @@ export const generatePriorAuth = (
     body: JSON.stringify({ fhir_bundle, coverage_result, raw_note, session_id }),
   });
 
+export const fetchFromFHIRServer = (req: import('../types').FHIRFetchRequest): Promise<import('../types').FHIRFetchResponse> =>
+  fetchJSON<import('../types').FHIRFetchResponse>(`${API_BASE}/notes/fetch-fhir`, {
+    method: 'POST',
+    body: JSON.stringify(req),
+  });
+
 export const getSubmissionHistory = () =>
   fetchJSON<{ total: number; page: number; items: Array<{ id: string; created_at: string; decision: string | null; raw_note_preview: string }> }>(
     `${API_BASE}/prior-auth/history`

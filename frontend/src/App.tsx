@@ -9,7 +9,7 @@ import { Step2_FHIRStructuring } from './steps/Step2_FHIRStructuring';
 import { Step3_CoverageDecision } from './steps/Step3_CoverageDecision';
 import { Step4_PriorAuth } from './steps/Step4_PriorAuth';
 import { HistoryPage } from './pages/HistoryPage';
-import { structureNote, evaluateCoverage, generatePriorAuth, pollCoverageTask, submitCoverageReply, API_BASE } from './api/healthprior';
+import { structureNote, evaluateCoverage, generatePriorAuth, pollCoverageTask, submitCoverageReply, fetchFromFHIRServer, API_BASE } from './api/healthprior';
 import type { WizardStep, FHIRBundle, CoverageResult, PriorAuthPackage, A2ADataPart, A2ATextPart } from './types';
 
 function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
@@ -51,6 +51,13 @@ function WizardApp() {
   const [a2aTaskId, setA2ATaskId] = useState<string | null>(null);
   const [payerQuestion, setPayerQuestion] = useState<string | null>(null);
   const [payerCriterion, setPayerCriterion] = useState<string | null>(null);
+  // fhirFetchMeta stores resource counts from a FHIR server fetch for display purposes
+  const [fhirFetchMeta, setFhirFetchMeta] = useState<{
+    source: string;
+    fhirServerUrl: string;
+    patientId: string;
+    resourceCounts: Record<string, number>;
+  } | null>(null);
 
   const handleStructureNote = async (note: string, model: string, policyId: string, modelB?: string) => {
     setLoading(true);
@@ -137,6 +144,25 @@ function WizardApp() {
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to structure note');
       setIsStreaming(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFetchFromFHIR = async (fhirServerUrl: string, patientId: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await fetchFromFHIRServer({
+        fhir_server_url: fhirServerUrl,
+        patient_id: patientId,
+        session_id: sessionId,
+      });
+      setFhirBundle(result.fhir_bundle);
+      setFhirFetchMeta({ source: 'fhir_server', fhirServerUrl, patientId, resourceCounts: result.resource_counts });
+      setStep(2);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to fetch patient record');
     } finally {
       setLoading(false);
     }
@@ -244,6 +270,7 @@ function WizardApp() {
     setA2ATaskId(null);
     setPayerQuestion(null);
     setPayerCriterion(null);
+    setFhirFetchMeta(null);
   };
 
   // Build a partial bundle for streaming display
@@ -271,7 +298,7 @@ function WizardApp() {
         </div>
       )}
 
-      {loading && step === 1 && !isStreaming && <LoadingSpinner message="Calling MCP server + structuring note with LLM..." />}
+      {loading && step === 1 && !isStreaming && <LoadingSpinner message={fhirFetchMeta ? `Fetching from ${fhirFetchMeta.fhirServerUrl}...` : 'Calling MCP server + structuring note with LLM...'} />}
       {loading && step === 3 && !coverageResult && <LoadingSpinner message="Evaluating against Molina MCR-621 criteria..." />}
       {loading && step === 3 && coverageResult && <LoadingSpinner message="Generating prior auth package..." />}
 
@@ -292,7 +319,7 @@ function WizardApp() {
         {!loading && !isStreaming && (
           <>
             {step === 1 && (
-              <Step1_NoteInput onSubmit={handleStructureNote} loading={loading} />
+              <Step1_NoteInput onSubmit={handleStructureNote} onFetchFromFHIR={handleFetchFromFHIR} loading={loading} />
             )}
             {step === 2 && fhirBundle && (
               <Step2_FHIRStructuring

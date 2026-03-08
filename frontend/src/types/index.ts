@@ -146,3 +146,19 @@ export interface AuditTrail {
   total_tokens?: number;
   total_latency_ms?: number;
 }
+
+export interface FHIRFetchRequest {
+  fhir_server_url: string;
+  patient_id: string;
+  policy_id?: string;
+  session_id?: string;
+}
+
+export interface FHIRFetchResponse {
+  fhir_bundle: FHIRBundle;
+  patient_name: string;
+  source: 'fhir_server';
+  fhir_server_url: string;
+  patient_id: string;
+  resource_counts: Record<string, number>;
+}
