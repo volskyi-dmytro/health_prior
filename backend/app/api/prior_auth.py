@@ -43,7 +43,7 @@ async def generate_prior_auth(request: PriorAuthRequest, db: AsyncSession = Depe
             text("""
                 INSERT INTO prior_auth_submissions
                 (id, raw_note, fhir_bundle, coverage_result, prior_auth_package, decision)
-                VALUES (:id, :raw_note, :fhir_bundle::jsonb, :coverage_result::jsonb, :prior_auth_package::jsonb, :decision)
+                VALUES (:id, :raw_note, CAST(:fhir_bundle AS jsonb), CAST(:coverage_result AS jsonb), CAST(:prior_auth_package AS jsonb), :decision)
             """),
             {
                 "id": package.submission_id,
@@ -131,7 +131,7 @@ async def list_submissions(
 
 @router.get("/{submission_id}/audit")
 async def get_submission_audit(submission_id: str, db: AsyncSession = Depends(get_db)):
-    """Return all audit log entries for a given submission."""
+    """Return audit trail for a submission in the shape expected by the frontend."""
     result = await db.execute(
         text("""
             SELECT id, submission_id, event_type, model_used,
@@ -144,20 +144,31 @@ async def get_submission_audit(submission_id: str, db: AsyncSession = Depends(ge
         {"submission_id": submission_id},
     )
     rows = result.fetchall()
-    return [
-        {
-            "id": str(row.id),
-            "submission_id": str(row.submission_id),
-            "event_type": row.event_type,
-            "model_used": row.model_used,
-            "prompt_tokens": row.prompt_tokens,
-            "completion_tokens": row.completion_tokens,
+
+    entries = []
+    total_tokens = 0
+    total_latency = 0
+    for row in rows:
+        tokens = (row.prompt_tokens or 0) + (row.completion_tokens or 0)
+        total_tokens += tokens
+        total_latency += row.latency_ms or 0
+        tools = row.mcp_tools_called or []
+        entries.append({
+            "step": row.event_type.replace("_", " ").title(),
+            "model": row.model_used,
+            "tool": tools[0] if tools else None,
+            "input_tokens": row.prompt_tokens,
+            "output_tokens": row.completion_tokens,
             "latency_ms": row.latency_ms,
-            "mcp_tools_called": row.mcp_tools_called,
-            "created_at": row.created_at.isoformat() if row.created_at else None,
-        }
-        for row in rows
-    ]
+            "timestamp": row.created_at.isoformat() if row.created_at else None,
+        })
+
+    return {
+        "submission_id": submission_id,
+        "entries": entries,
+        "total_tokens": total_tokens if total_tokens > 0 else None,
+        "total_latency_ms": total_latency if total_latency > 0 else None,
+    }
 
 
 @router.get("/{submission_id}/pdf")

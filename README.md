@@ -107,7 +107,7 @@ The frontend `/history` route provides a full-page table with CSV export.
 After LLM structuring, each FHIR resource is validated for required fields (`_sourceRef`, `code`, etc.). On failure, the LLM is retried once with a clarifying prompt before returning HTTP 422.
 
 ### Audit Log
-Every LLM call (note structuring, coverage evaluation, prior auth generation) is recorded in the `audit_log` table with model name, token usage, latency, and MCP tools called. View via `GET /prior-auth/submissions/{id}/audit` or the Audit Trail tab in the UI.
+Every LLM call (note structuring, coverage evaluation, prior auth generation) is recorded in the `audit_log` table with model name, token usage, latency, and MCP tools called. View via `GET /prior-auth/{id}/audit` or the Audit Trail tab in the UI.
 
 ### PDF Prior Auth Letter
 `GET /prior-auth/{id}/pdf` returns a formatted PDF letter (ReportLab) ready for faxing to a payer. The frontend Step 4 includes a "Download PDF Letter" button alongside "Download JSON".

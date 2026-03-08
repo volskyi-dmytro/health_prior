@@ -28,7 +28,7 @@ export const getPolicies = () =>
     .then(rows => rows.map(p => ({ id: p.id, name: `${p.payer}: ${p.procedure_name} (${p.cpt_code})` })));
 
 export const getSubmissionAudit = (id: string) =>
-  fetchJSON<import('../types').AuditTrail>(`${API_BASE}/submissions/${id}/audit`);
+  fetchJSON<import('../types').AuditTrail>(`${API_BASE}/prior-auth/${id}/audit`);
 
 export const getPriorAuthPdfUrl = (submission_id: string) =>
   `${API_BASE}/prior-auth/${submission_id}/pdf`;

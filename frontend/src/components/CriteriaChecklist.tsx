@@ -2,16 +2,32 @@ import { motion } from 'framer-motion';
 import { CheckCircle2, Circle } from 'lucide-react';
 
 const CRITERIA_LABELS: Record<string, string> = {
-  chronic_pain_conservative_failure: 'Conservative therapy ≥6 weeks (PT + medication)',
-  neurologic_weakness: 'Progressive lower extremity weakness',
-  neurologic_reflexes: 'Absent or asymmetric deep tendon reflexes',
-  neurologic_sensory: 'Dermatomal sensory loss',
-  cauda_equina: 'Cauda equina syndrome signs (bowel/bladder/saddle)',
-  trauma: 'Significant spinal trauma / fracture',
-  tumor_mass: 'Suspected tumor or spinal metastasis',
-  infection: 'Suspected spinal infection',
-  positive_slr: 'Positive straight leg raise test',
-  radiculopathy_confirmed: 'Confirmed radiculopathy / sciatica',
+  chronic_pain_conservative_trial: 'Conservative therapy ≥6 weeks (PT + medication)',
+  chronic_pain_worsening: 'Worsening pain or progression during conservative treatment',
+  neurological_weakness_reflexes_sensory: 'Weakness, abnormal reflexes, or dermatomal sensory change',
+  bowel_bladder_dysfunction: 'Bowel or bladder dysfunction',
+  saddle_anesthesia: 'Saddle anesthesia',
+  abnormal_emg_ncs: 'Abnormal EMG/NCS findings',
+  muscle_atrophy: 'Atrophy of related muscles',
+  neurogenic_claudication: 'Neurogenic claudication (pseudoclaudication)',
+  scoliosis: 'Scoliosis (ordered by orthopedist or neurosurgeon)',
+  tumor_initial_evaluation: 'Initial evaluation of recently diagnosed cancer',
+  tumor_followup: 'Follow-up of known tumor or mass',
+  tumor_surveillance: 'Surveillance of known tumor or mass',
+  tumor_bone_pain_cancer: 'Severe bone pain with history of cancer',
+  tumor_bone_scan: 'Positive bone scan / x-rays suggestive for bone cancer',
+  trauma_conservative_failure: 'Trauma — failure to respond to 6-week conservative care',
+  trauma_worsening: 'Trauma — worsening pain or symptom progression',
+  trauma_fracture: 'Trauma — evaluation of spinal fractures',
+  immune_suppression: 'Spine abnormalities related to immune suppression (e.g. HIV)',
+  infection_inflammation: 'Suspected infection, abscess, or inflammatory disease',
+  congenital_sacral_dimple: 'Sacral dimple suspicious for dysraphism',
+  congenital_dysraphism: 'Known spinal dysraphism or spina bifida',
+  congenital_tethered_cord: 'Possible tethered cord',
+  ankylosing_spondylitis: 'Suspected Ankylosing Spondylitis',
+  spinal_vascular_lesion: 'Known or suspected spinal vascular lesion',
+  preoperative: 'Pre-operative evaluation for lumbar spine surgery',
+  postoperative: 'Post-operative follow-up or complication evaluation',
 };
 
 interface Props {
@@ -20,7 +36,11 @@ interface Props {
 }
 
 export function CriteriaChecklist({ matchedCriteria, unmetCriteria }: Props) {
-  const allCriteria = Object.keys(CRITERIA_LABELS);
+  // Show matched first, then unmet — only criteria the LLM actually evaluated
+  const evaluated = [
+    ...matchedCriteria.map((id) => ({ id, isMatched: true })),
+    ...unmetCriteria.map((id) => ({ id, isMatched: false })),
+  ];
 
   return (
     <div className="space-y-2">
@@ -30,16 +50,14 @@ export function CriteriaChecklist({ matchedCriteria, unmetCriteria }: Props) {
       >
         Molina MCR-621 — Coverage Criteria
       </h3>
-      {allCriteria.map((id, i) => {
-        const isMatched = matchedCriteria.includes(id);
-        const isChecked = isMatched || unmetCriteria.includes(id);
-        const label = CRITERIA_LABELS[id] || id;
+      {evaluated.map(({ id, isMatched }, i) => {
+        const label = CRITERIA_LABELS[id] || id.replace(/_/g, ' ');
 
         return (
           <motion.div
             key={id}
             initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: isChecked ? 1 : 0.35, x: 0 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.07, duration: 0.3 }}
             className="flex items-center gap-3 p-2.5 rounded-xl transition-all"
             style={isMatched ? { background: 'rgba(253,179,82,0.12)', border: '1px solid rgba(253,179,82,0.35)' } : {}}
@@ -62,6 +80,11 @@ export function CriteriaChecklist({ matchedCriteria, unmetCriteria }: Props) {
           </motion.div>
         );
       })}
+      {evaluated.length === 0 && (
+        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#9ca3af' }}>
+          No criteria evaluated.
+        </p>
+      )}
     </div>
   );
 }
