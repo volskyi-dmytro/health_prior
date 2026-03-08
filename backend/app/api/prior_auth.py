@@ -107,7 +107,10 @@ async def list_submissions(
 
     result = await db.execute(
         text(f"""
-            SELECT id, created_at, decision, LEFT(raw_note, 200) as raw_note_preview
+            SELECT id, created_at, decision, LEFT(raw_note, 200) as raw_note_preview,
+                   prior_auth_package->'patient'->>'id' as patient_id,
+                   coverage_result->>'policy_id' as policy,
+                   (coverage_result->>'confidence_score')::float as confidence_score
             FROM prior_auth_submissions
             {where_clause}
             ORDER BY created_at DESC
@@ -122,6 +125,9 @@ async def list_submissions(
             created_at=row.created_at,
             decision=row.decision,
             raw_note_preview=row.raw_note_preview,
+            patient_id=row.patient_id,
+            policy=row.policy,
+            confidence_score=row.confidence_score,
         )
         for row in rows
     ]

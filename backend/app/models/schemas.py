@@ -71,3 +71,6 @@ class SubmissionHistory(BaseModel):
     created_at: datetime
     decision: Optional[str]
     raw_note_preview: str
+    patient_id: Optional[str] = None
+    policy: Optional[str] = None
+    confidence_score: Optional[float] = None

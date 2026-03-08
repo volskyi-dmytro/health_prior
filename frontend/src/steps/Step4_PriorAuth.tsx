@@ -56,9 +56,9 @@ function AuditTrailView({ submissionId }: { submissionId: string }) {
   return (
     <div>
       {/* Summary stats */}
-      {(audit.total_tokens !== undefined || audit.total_latency_ms !== undefined) && (
+      {(audit.total_tokens != null || audit.total_latency_ms != null) && (
         <div className="grid grid-cols-2 gap-4 mb-5">
-          {audit.total_tokens !== undefined && (
+          {audit.total_tokens != null && (
             <div className="rounded-xl p-4" style={{ background: '#FFFFFF', border: '1px solid #e5e7eb' }}>
               <span
                 className="block uppercase tracking-wider mb-1"
@@ -71,7 +71,7 @@ function AuditTrailView({ submissionId }: { submissionId: string }) {
               </span>
             </div>
           )}
-          {audit.total_latency_ms !== undefined && (
+          {audit.total_latency_ms != null && (
             <div className="rounded-xl p-4" style={{ background: '#FFFFFF', border: '1px solid #e5e7eb' }}>
               <span
                 className="block uppercase tracking-wider mb-1"
