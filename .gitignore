@@ -31,6 +31,9 @@ dist/
 CLAUDE.md
 prompts/
 
+# Validation documentation (internal use only)
+documentation/
+
 # Editor
 .idea/
 .vscode/

@@ -120,7 +120,7 @@ Pass `model_b` to `POST /notes/structure` to run two models in parallel (`asynci
 
 ## Policy Ingestion
 
-Coverage criteria are stored as structured JSON in `backend/app/data/` and loaded at runtime via `policy_loader.py`. The included `molina_mcr621_criteria.json` was extracted from the Molina MCR-621 PDF (Lumbar Spine MRI, CPT 72148/72149/72158).
+Coverage criteria are stored as structured JSON in `backend/app/data/` and loaded at runtime via `policy_loader.py`. The included `mcr_621_criteria.json` (MCR-621 → lowercase → `-` replaced with `_`) was extracted from the Molina MCR-621 PDF (Lumbar Spine MRI, CPT 72148/72149/72158).
 
 To regenerate criteria JSON from an updated PDF:
 

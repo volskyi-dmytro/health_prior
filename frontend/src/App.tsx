@@ -145,6 +145,7 @@ function WizardApp() {
       setStep(3);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to evaluate coverage');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setLoading(false);
     }

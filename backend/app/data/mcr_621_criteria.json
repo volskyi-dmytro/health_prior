@@ -1,0 +1,241 @@
+{
+  "policy_id": "MCR-621",
+  "policy_name": "Lumbar Spine MRI",
+  "procedure": {
+    "cpt_code": "72148",
+    "description": "MRI lumbar spine without contrast (also covers 72149 with contrast, 72158 without and with contrast)"
+  },
+  "coverage_criteria": [
+    {
+      "id": "chronic_pain_conservative_trial",
+      "category": "chronic_pain",
+      "description": "Chronic pain with documented trial of conservative therapy for 6 weeks (ending within last 6 months). Conservative care must include inactive treatments (anti-inflammatory medications, activity modification, bracing, icing) PLUS at least one active treatment: Physical Therapy, Chiropractic Therapy, or Provider supervised home exercise program.",
+      "keywords": ["chronic pain", "conservative therapy", "physical therapy", "chiropractic", "home exercise", "anti-inflammatory", "6 weeks", "NSAID", "bracing", "activity modification"],
+      "required_duration_weeks": 6,
+      "icd10_codes": ["M54.5", "M54.51", "M54.59"]
+    },
+    {
+      "id": "chronic_pain_worsening",
+      "category": "chronic_pain",
+      "description": "Worsening pain or symptom progression during the course of conservative treatments.",
+      "keywords": ["worsening pain", "symptom progression", "worsening symptoms", "progressive pain", "deteriorating"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["M54.5", "M54.51", "M54.59"]
+    },
+    {
+      "id": "neurological_weakness_reflexes_sensory",
+      "category": "neurological",
+      "description": "Weakness, abnormal reflexes, or dermatomal sensory change documented on physical exam.",
+      "keywords": ["weakness", "abnormal reflexes", "dermatomal sensory", "sensory change", "motor deficit", "reflex abnormal", "paresis", "DTR"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["M54.4", "G57", "G54.4", "R29.2", "R20.2"]
+    },
+    {
+      "id": "bowel_bladder_dysfunction",
+      "category": "neurological",
+      "description": "Bowel or bladder dysfunction (decreased anal sphincter tone, or urinary issues not due to stress incontinence or other female related urinary issues).",
+      "keywords": ["bowel dysfunction", "bladder dysfunction", "urinary incontinence", "anal sphincter", "urinary retention", "bowel incontinence"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["G83.4", "R15", "R33"]
+    },
+    {
+      "id": "saddle_anesthesia",
+      "category": "neurological",
+      "description": "Saddle anesthesia.",
+      "keywords": ["saddle anesthesia", "saddle numbness", "perineal numbness", "perianal numbness"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["G83.4"]
+    },
+    {
+      "id": "abnormal_emg_ncs",
+      "category": "neurological",
+      "description": "Abnormal electromyography (EMG) and nerve conduction study (NCS) findings indicating a spinal abnormality.",
+      "keywords": ["EMG", "electromyography", "nerve conduction", "NCS", "abnormal EMG", "electrodiagnostic"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["M54.4", "G54.4"]
+    },
+    {
+      "id": "muscle_atrophy",
+      "category": "neurological",
+      "description": "Atrophy of related muscles.",
+      "keywords": ["atrophy", "muscle atrophy", "wasting", "muscle wasting"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["M62.50", "M62.58"]
+    },
+    {
+      "id": "neurogenic_claudication",
+      "category": "neurological",
+      "description": "Neurogenic claudication (pseudoclaudication) only if x-ray shows significant lumbar spinal stenosis AND intervention is considered.",
+      "keywords": ["neurogenic claudication", "pseudoclaudication", "spinal stenosis", "claudication", "lumbar stenosis"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["M48.06", "G99.2"]
+    },
+    {
+      "id": "scoliosis",
+      "category": "neurological",
+      "description": "Scoliosis, when ordered by orthopedist or neurosurgeon and age of patient and severity of scoliosis on x-ray indicate bracing or surgery may be provided.",
+      "keywords": ["scoliosis", "spinal curvature", "orthopedist", "neurosurgeon"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["M41.06", "M41.16", "Q67.5"]
+    },
+    {
+      "id": "tumor_initial_evaluation",
+      "category": "tumor",
+      "description": "Initial evaluation of a recently diagnosed cancer.",
+      "keywords": ["cancer", "malignancy", "tumor", "recently diagnosed", "oncology"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["C79.51", "D49.2", "C41.2"]
+    },
+    {
+      "id": "tumor_followup",
+      "category": "tumor",
+      "description": "Follow up of a known tumor or mass after completion of treatment or with new signs/symptoms.",
+      "keywords": ["tumor follow up", "mass follow up", "known tumor", "known mass", "post treatment", "new symptoms"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["C79.51", "D49.2", "M49.5"]
+    },
+    {
+      "id": "tumor_surveillance",
+      "category": "tumor",
+      "description": "Surveillance of a known tumor or mass according to accepted clinical standards.",
+      "keywords": ["surveillance", "monitoring", "known tumor", "known mass"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["C79.51", "D49.2"]
+    },
+    {
+      "id": "tumor_bone_pain_cancer",
+      "category": "tumor",
+      "description": "Severe bone pain with history of cancer.",
+      "keywords": ["bone pain", "history of cancer", "cancer history", "severe bone pain", "metastasis"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["C79.51", "M54.5"]
+    },
+    {
+      "id": "tumor_bone_scan",
+      "category": "tumor",
+      "description": "Positive bone scan and/or x-rays suggestive for bone cancer (primary or metastatic).",
+      "keywords": ["bone scan", "positive bone scan", "lytic lesion", "metastatic", "bone cancer", "x-ray suggestive"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["C79.51", "D49.2"]
+    },
+    {
+      "id": "trauma_conservative_failure",
+      "category": "trauma",
+      "description": "Trauma with failure to respond to a 6-week trial of conservative care (includes blunt trauma with abnormal neurological findings). Conservative care includes inactive and active treatments.",
+      "keywords": ["trauma", "blunt trauma", "conservative care failure", "failed conservative", "MVA", "fall", "motor vehicle accident"],
+      "required_duration_weeks": 6,
+      "icd10_codes": ["S32", "S33", "M48.4"]
+    },
+    {
+      "id": "trauma_worsening",
+      "category": "trauma",
+      "description": "Trauma with worsening pain or symptom progression during the course of conservative treatments.",
+      "keywords": ["trauma", "worsening pain", "symptom progression", "worsening"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["S32", "S33"]
+    },
+    {
+      "id": "trauma_fracture",
+      "category": "trauma",
+      "description": "Trauma requiring evaluation of spinal fractures.",
+      "keywords": ["fracture", "spinal fracture", "vertebral fracture", "compression fracture", "trauma fracture"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["S32.009A", "M48.4", "S32"]
+    },
+    {
+      "id": "immune_suppression",
+      "category": "infection",
+      "description": "Evaluation of spine abnormalities related to immune system suppression (e.g. HIV, chemotherapy, leukemia, or lymphoma).",
+      "keywords": ["immune suppression", "immunocompromised", "HIV", "chemotherapy", "leukemia", "lymphoma", "immunosuppressed"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["B20", "Z79.899", "C91", "C85"]
+    },
+    {
+      "id": "infection_inflammation",
+      "category": "infection",
+      "description": "Suspected infection, abscess, or inflammatory disease with abnormal signs, symptoms, lab tests or other imaging findings.",
+      "keywords": ["infection", "abscess", "osteomyelitis", "discitis", "inflammatory disease", "fever", "elevated ESR", "elevated CRP", "spondylitis"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["M46.3", "M46.4", "M46.2", "M46.5"]
+    },
+    {
+      "id": "congenital_sacral_dimple",
+      "category": "other",
+      "description": "Sacral dimples suspicious for dysraphism because of skin lesions such as hairy patches, sacral lipomas, hemangioma, dimple larger than 0.5 cm, or distance greater than 2.5 cm from anal verge.",
+      "keywords": ["sacral dimple", "dysraphism", "hairy patch", "sacral lipoma", "hemangioma", "spina bifida occulta"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["Q05.9", "Q06.8"]
+    },
+    {
+      "id": "congenital_dysraphism",
+      "category": "other",
+      "description": "Known spinal dysraphism or spina bifida which needs follow-up.",
+      "keywords": ["spinal dysraphism", "spina bifida", "dysraphism follow-up"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["Q05", "Q05.9"]
+    },
+    {
+      "id": "congenital_tethered_cord",
+      "category": "other",
+      "description": "Possible tethered cord.",
+      "keywords": ["tethered cord", "tethered spinal cord"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["Q06.8"]
+    },
+    {
+      "id": "ankylosing_spondylitis",
+      "category": "other",
+      "description": "Suspected Ankylosing Spondylitis with sacral iliac pain, high ESR or C-reactive protein, positive HLA-B27, or indeterminate x-ray result.",
+      "keywords": ["ankylosing spondylitis", "sacral iliac pain", "sacroiliac pain", "ESR", "CRP", "HLA-B27", "spondylitis"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["M45", "M45.9"]
+    },
+    {
+      "id": "spinal_vascular_lesion",
+      "category": "other",
+      "description": "Known or suspected spinal vascular lesion or malformation.",
+      "keywords": ["vascular lesion", "vascular malformation", "arteriovenous fistula", "spinal AVM", "spinal vascular"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["Q28.2", "I67.1"]
+    },
+    {
+      "id": "preoperative",
+      "category": "other",
+      "description": "Pre-operative evaluation when surgery is planned on the lumbar spine.",
+      "keywords": ["pre-operative", "preoperative", "surgery planned", "surgical planning", "pre-op"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["Z01.818"]
+    },
+    {
+      "id": "postoperative",
+      "category": "other",
+      "description": "Post-operative for routine recommended follow up or for potential post-operative complications.",
+      "keywords": ["post-operative", "postoperative", "post-op", "post-surgical", "surgical follow up", "operative complications"],
+      "required_duration_weeks": null,
+      "icd10_codes": ["Z09", "T81"]
+    }
+  ],
+  "exclusion_criteria": [
+    {
+      "id": "mri_contraindication_metallic",
+      "description": "Metallic body in the eye, magnetically activated implanted devices such as pacemakers, defibrillators, insulin pumps, or neurostimulators, certain types of metal, or aneurysm clipping.",
+      "keywords": ["pacemaker", "defibrillator", "insulin pump", "neurostimulator", "metallic implant", "aneurysm clip", "metal in eye"]
+    },
+    {
+      "id": "acute_uncomplicated_no_neuro",
+      "description": "Acute uncomplicated low back pain (less than 6 weeks) without neurological findings.",
+      "keywords": ["acute", "uncomplicated", "no neurological findings", "less than 6 weeks"]
+    },
+    {
+      "id": "no_treatment_impact",
+      "description": "Tests that will not change treatment plans should not be recommended.",
+      "keywords": ["no change in treatment", "will not affect care"]
+    },
+    {
+      "id": "recent_similar_imaging",
+      "description": "Same or similar tests recently completed without a specific reason for repeat imaging.",
+      "keywords": ["recent imaging", "repeat imaging", "duplicate imaging", "recently completed"]
+    }
+  ],
+  "notes": "Policy last approved 12/8/2021. In children and adolescents, spinal imaging is not necessarily subject to a failed course of conservative therapy — early intervention may be appropriate. For repeat studies, the reason for the repeat and that it will affect care must be clear. CPT codes covered: 72148 (without contrast), 72149 (with contrast), 72158 (without and with contrast). NCD/LCD directives supersede this policy for Medicare members."
+}
