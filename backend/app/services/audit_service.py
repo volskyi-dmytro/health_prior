@@ -9,10 +9,13 @@ submission_id: the prior_auth_submissions PK — only set after the submission
                row is created (in prior_auth/generate). Earlier rows are
                backfilled by an UPDATE in that endpoint.
 """
+import logging
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 import json
+
+logger = logging.getLogger(__name__)
 
 
 async def log_llm_call(
@@ -35,7 +38,7 @@ async def log_llm_call(
                      completion_tokens, latency_ms, mcp_tools_called)
                 VALUES
                     (:id, :submission_id, :session_id, :event_type, :model_used, :prompt_tokens,
-                     :completion_tokens, :latency_ms, :mcp_tools_called::jsonb)
+                     :completion_tokens, :latency_ms, CAST(:mcp_tools_called AS jsonb))
             """),
             {
                 "id": str(uuid.uuid4()),
@@ -51,4 +54,5 @@ async def log_llm_call(
         )
         await db.commit()
     except Exception:
+        logger.exception("audit_log insert failed (event_type=%s)", event_type)
         await db.rollback()
