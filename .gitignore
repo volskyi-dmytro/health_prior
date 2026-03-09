@@ -40,3 +40,4 @@ documentation/
 *.swp
 *.swo
 .DS_Store
+.claude/
