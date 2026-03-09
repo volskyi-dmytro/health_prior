@@ -44,4 +44,8 @@ class AuditLog(Base):
     completion_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
     latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
     mcp_tools_called: Mapped[list | None] = mapped_column(JSONB, nullable=True)
+    # session_id tracks the frontend wizard session; no FK so it can be written before
+    # a prior_auth_submission row exists.  prior_auth/generate backfills submission_id
+    # by matching this column once the submission is stored.
+    session_id: Mapped[str | None] = mapped_column(Text, nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

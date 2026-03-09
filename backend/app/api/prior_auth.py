@@ -56,15 +56,25 @@ async def generate_prior_auth(request: PriorAuthRequest, db: AsyncSession = Depe
             },
         )
         await db.commit()
+
+        # Backfill earlier audit_log rows (note_structured, coverage_evaluated) that were
+        # written with session_id before the submission row existed.
+        if request.session_id:
+            await db.execute(
+                text("UPDATE audit_log SET submission_id = :db_id WHERE session_id = :session_id"),
+                {"db_id": str(package.submission_id), "session_id": request.session_id},
+            )
+        await db.commit()
     except Exception:
         await db.rollback()
         # Non-fatal — still return the package
 
-    # Audit log for prior_auth_generated
+    # Audit log for prior_auth_generated (submission row now exists, FK safe)
     await log_llm_call(
         db=db,
         event_type="prior_auth_generated",
-        submission_id=package.submission_id,
+        submission_id=str(package.submission_id),
+        session_id=request.session_id,
     )
 
     return package

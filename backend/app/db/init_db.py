@@ -29,8 +29,13 @@ async def seed_policies(session):
 
 
 async def init_db():
+    from sqlalchemy import text
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # Idempotent column migration — safe to run against existing databases
+        await conn.execute(text(
+            "ALTER TABLE audit_log ADD COLUMN IF NOT EXISTS session_id TEXT"
+        ))
 
     async with AsyncSessionLocal() as session:
         await seed_policies(session)

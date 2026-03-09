@@ -2,6 +2,7 @@ import asyncio
 import json
 from typing import Optional, AsyncGenerator
 
+import httpx
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -93,7 +94,7 @@ async def _structure_with_model(
         completion_tokens=meta.completion_tokens,
         latency_ms=meta.latency_ms,
         mcp_tools_called=["get_coverage_criteria"],
-        submission_id=session_id,
+        session_id=session_id,
     )
 
     return NoteStructureResponse(
@@ -103,7 +104,7 @@ async def _structure_with_model(
     )
 
 
-@router.post("/structure", response_model=NoteStructureResponse)
+@router.post("/structure", response_model=None)
 async def structure_note(
     request: NoteStructureRequestExtended,
     db: AsyncSession = Depends(get_db),
@@ -174,7 +175,7 @@ async def _sse_note_stream(raw_note: str, model: str, mcp_context: dict | None, 
             completion_tokens=meta.completion_tokens,
             latency_ms=meta.latency_ms,
             mcp_tools_called=["get_coverage_criteria"],
-            submission_id=session_id,
+            session_id=session_id,
         )
 
     # Emit patient demographics
@@ -249,32 +250,70 @@ def _count_resources(bundle: dict) -> dict:
     return counts
 
 
+_FHIR_HEADERS = {"Accept": "application/fhir+json", "Content-Type": "application/fhir+json"}
+
+
+def _extract_bundle_entries(bundle: dict) -> list[dict]:
+    """Return the resource objects from a FHIR searchset Bundle."""
+    return [e.get("resource", e) for e in bundle.get("entry", [])]
+
+
 @router.post("/fetch-fhir", response_model=FHIRFetchResponse)
 async def fetch_fhir_patient(
     request: FHIRFetchRequest,
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Fetch a live patient record from a FHIR R4 server via the MCP tool layer.
+    Fetch a live patient record from a FHIR R4 server directly via httpx.
 
-    - Calls the MCP fetch_patient_record tool against the specified FHIR server
-    - Returns a FHIR Bundle with Patient, Conditions, MedicationRequests, and Observations
+    - Fetches Patient, Conditions, MedicationRequests, and Observations in parallel
+    - Assembles a FHIR Bundle from the results
     - Writes an audit log entry for observability
     """
-    mcp_client = MCPClient()
-    result = await mcp_client.call_tool(
-        "fetch_patient_record",
-        {
-            "fhir_server_url": request.fhir_server_url,
-            "patient_id": request.patient_id,
-        },
-    )
+    base = request.fhir_server_url.rstrip("/")
+    patient_id = request.patient_id
 
-    if isinstance(result, dict) and result.get("error"):
-        raise HTTPException(status_code=404, detail=result["error"])
+    async def _get(client: httpx.AsyncClient, url: str, params: dict | None = None) -> dict | None:
+        try:
+            resp = await client.get(url, params=params, headers=_FHIR_HEADERS)
+            if resp.status_code == 404:
+                return None
+            resp.raise_for_status()
+            return resp.json()
+        except httpx.HTTPStatusError:
+            return None
+        except Exception:
+            return None
 
-    # result is the FHIR Bundle
-    fhir_bundle = result if isinstance(result, dict) else {}
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            patient_data, conditions_data, medications_data, observations_data = await asyncio.gather(
+                _get(client, f"{base}/Patient/{patient_id}"),
+                _get(client, f"{base}/Condition", {"patient": patient_id, "clinical-status": "active"}),
+                _get(client, f"{base}/MedicationRequest", {"patient": patient_id, "status": "active"}),
+                _get(client, f"{base}/Observation", {"patient": patient_id, "_sort": "-date", "_count": "20"}),
+            )
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Connection error reaching FHIR server: {exc}")
+
+    if patient_data is None:
+        raise HTTPException(status_code=404, detail=f"Patient {patient_id} not found on FHIR server {request.fhir_server_url}")
+
+    conditions = _extract_bundle_entries(conditions_data) if conditions_data else []
+    medications = _extract_bundle_entries(medications_data) if medications_data else []
+    observations = _extract_bundle_entries(observations_data) if observations_data else []
+
+    fhir_bundle = {
+        "resourceType": "Bundle",
+        "type": "searchset",
+        "entry": [
+            {"resource": patient_data},
+            *[{"resource": r} for r in conditions],
+            *[{"resource": r} for r in medications],
+            *[{"resource": r} for r in observations],
+        ],
+    }
+
     patient_name = _extract_patient_name(fhir_bundle)
     resource_counts = _count_resources(fhir_bundle)
 

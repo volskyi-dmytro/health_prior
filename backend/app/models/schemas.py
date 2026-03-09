@@ -68,6 +68,7 @@ class SampleNote(BaseModel):
     description: str
     expected_decision: str
     content: str
+    type: str = ""
 
 class SubmissionHistory(BaseModel):
     id: str

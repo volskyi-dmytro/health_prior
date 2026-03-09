@@ -46,7 +46,7 @@ async def evaluate_coverage(
         completion_tokens=None,
         latency_ms=None,
         mcp_tools_called=[f"a2a:task:{response.id}"],
-        submission_id=request.session_id,
+        session_id=request.session_id,
     )
 
     return {"task_id": response.id, "state": response.status.state}

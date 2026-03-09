@@ -6,6 +6,7 @@ SAMPLE_NOTES = [
         title="Chronic Back Pain — PT Complete",
         description="8 weeks LBP, completed physical therapy, persistent pain",
         expected_decision="APPROVED",
+        type="H&P",
         content="""PATIENT: John M., DOB: 05/14/1968, MRN: 4821039
 DATE OF SERVICE: March 5, 2026
 ATTENDING PHYSICIAN: Dr. Sarah Chen, MD — Family Medicine
@@ -62,6 +63,7 @@ Plan: Patient has completed >6 weeks of conservative therapy including physical 
         title="Acute Pain — No Conservative Therapy",
         description="3 weeks LBP, no prior treatment, no neurological findings",
         expected_decision="DENIED",
+        type="progress_note",
         content="""PATIENT: Maria K., DOB: 11/22/1985, MRN: 7392841
 DATE OF SERVICE: March 5, 2026
 ATTENDING PHYSICIAN: Dr. James Torres, MD — Urgent Care
@@ -109,6 +111,7 @@ Plan: Patient presents with acute mechanical low back pain of 3-week duration fo
         title="Neurological Findings Present",
         description="Progressive weakness, absent reflexes, possible cauda equina",
         expected_decision="APPROVED",
+        type="consult_note",
         content="""PATIENT: Robert A., DOB: 03/08/1955, MRN: 9182736
 DATE OF SERVICE: March 5, 2026
 ATTENDING PHYSICIAN: Dr. Patricia Williams, MD — Neurology
