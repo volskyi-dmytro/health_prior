@@ -39,6 +39,22 @@ services:
       - "3100:80"
     restart: unless-stopped
 
+  payer-agent:
+    image: stpunk47/healthprior-payer-agent:${IMAGE_TAG:-latest}
+    container_name: healthprior-payer-agent
+    env_file: .env
+    ports:
+      - "8200:8200"
+    volumes:
+      - payer_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8200/.well-known/agent.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   postgres:
     image: postgres:16-alpine
     container_name: healthprior-postgres
@@ -54,3 +70,4 @@ services:
 
 volumes:
   postgres_data:
+  payer_data:

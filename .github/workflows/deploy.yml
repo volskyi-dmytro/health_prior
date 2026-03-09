@@ -10,6 +10,7 @@ env:
   REGISTRY: docker.io
   BACKEND_IMAGE: stpunk47/healthprior-backend
   FRONTEND_IMAGE: stpunk47/healthprior-frontend
+  PAYER_AGENT_IMAGE: stpunk47/healthprior-payer-agent
 
 jobs:
   test:
@@ -99,6 +100,17 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Build and push payer-agent
+        uses: docker/build-push-action@v5
+        with:
+          context: ./payer_agent
+          push: true
+          tags: |
+            ${{ env.PAYER_AGENT_IMAGE }}:${{ steps.meta.outputs.version }}
+            ${{ env.PAYER_AGENT_IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -138,6 +150,7 @@ jobs:
             # Pull new images
             docker pull stpunk47/healthprior-backend:$IMAGE_TAG
             docker pull stpunk47/healthprior-frontend:$IMAGE_TAG
+            docker pull stpunk47/healthprior-payer-agent:$IMAGE_TAG
 
             # Update .env IMAGE_TAG
             sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG=$IMAGE_TAG/" .env || echo "IMAGE_TAG=$IMAGE_TAG" >> .env
@@ -164,6 +177,15 @@ jobs:
                 echo "MCP server healthy"
                 break
               fi
+              sleep 3
+            done
+
+            for i in $(seq 1 20); do
+              if curl -sf http://localhost:8200/.well-known/agent.json > /dev/null 2>&1; then
+                echo "Payer agent healthy"
+                break
+              fi
+              echo "Waiting for payer agent... attempt $i"
               sleep 3
             done
 
