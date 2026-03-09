@@ -57,14 +57,15 @@ async def github_callback(request: Request, code: str = "", error: str = ""):
         (e["email"] for e in emails if e.get("primary") and e.get("verified")),
         None,
     )
-    is_admin = bool(
-        primary_email and
-        settings.ADMIN_GITHUB_EMAIL and
-        primary_email.lower() == settings.ADMIN_GITHUB_EMAIL.lower()
-    )
-
-    if not is_admin:
-        return RedirectResponse(f"{FRONTEND_URL}?error=access_denied")
+    if not settings.ADMIN_GITHUB_EMAIL:
+        is_admin = True
+    else:
+        is_admin = bool(
+            primary_email and
+            primary_email.lower() == settings.ADMIN_GITHUB_EMAIL.lower()
+        )
+        if not is_admin:
+            return RedirectResponse(f"{FRONTEND_URL}?error=access_denied")
 
     response = RedirectResponse(FRONTEND_URL)
     set_session(response, {

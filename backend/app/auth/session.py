@@ -43,6 +43,6 @@ def require_auth(request: Request) -> dict:
     user = get_session(request)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
-    if not user.get("is_admin"):
+    if settings.ADMIN_GITHUB_EMAIL and not user.get("is_admin"):
         raise HTTPException(status_code=403, detail="Access denied")
     return user

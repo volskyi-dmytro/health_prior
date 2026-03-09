@@ -34,6 +34,8 @@ services:
     env_file: .env
     environment:
       - PAYER_AGENT_URL=http://payer-agent:8200
+    volumes:
+      - payer_data:/data
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8200/.well-known/agent.json || exit 1"]
       interval: 10s
@@ -66,3 +68,4 @@ services:
 
 volumes:
   postgres_data:
+  payer_data:
