@@ -143,4 +143,4 @@ class LLMService:
             raw = raw.split("```")[1]
             if raw.startswith("json"):
                 raw = raw[4:]
-        return json.loads(raw.strip())
+        return json.loads(raw.strip(), strict=False)

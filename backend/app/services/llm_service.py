@@ -159,7 +159,7 @@ class LLMService:
             result_str = result_str.split("```")[1]
             if result_str.startswith("json"):
                 result_str = result_str[4:]
-        return json.loads(result_str.strip())
+        return json.loads(result_str.strip(), strict=False)
 
     async def structure_note(
         self,
