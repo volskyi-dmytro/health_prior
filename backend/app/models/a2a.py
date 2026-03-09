@@ -28,7 +28,7 @@ Part = Annotated[Union[TextPart, DataPart, FilePart], Field(discriminator="type"
 class Message(BaseModel):
     role: Literal["user", "agent"]
     parts: list[Part]
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] | None = None
 
 
 TaskState = Literal["submitted", "working", "input-required", "completed", "failed", "canceled"]
@@ -46,14 +46,14 @@ class Task(BaseModel):
     status: TaskStatus
     history: list[Message] = Field(default_factory=list)
     artifacts: list[dict[str, Any]] = Field(default_factory=list)
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] | None = None
 
 
 class SendTaskRequest(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     session_id: str | None = None
     message: Message
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] | None = None
 
 
 class SendTaskResponse(BaseModel):

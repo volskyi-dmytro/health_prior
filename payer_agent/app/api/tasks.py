@@ -46,6 +46,9 @@ def _extract_fhir_and_policy(message: Message) -> tuple[dict[str, Any], str]:
     """Pull the FHIR bundle dict and optional policy_id out of a Message."""
     fhir_bundle: dict[str, Any] = {}
     policy_id = "MCR-621"
+    # Check message-level metadata first (set by the backend a2a_client)
+    if message.metadata:
+        policy_id = message.metadata.get("policy_id", policy_id)
     for part in message.parts:
         if isinstance(part, DataPart):
             fhir_bundle = part.data.get("fhir_bundle", part.data)

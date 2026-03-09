@@ -27,6 +27,13 @@ Return a JSON object:
   "confidence_score": 0.0-1.0
 }
 
+Confidence score calibration — use the FULL range, not just high values:
+- 0.90–1.00: All criteria clearly met/unmet with explicit, unambiguous documentation
+- 0.75–0.89: Most criteria well-supported but minor documentation gaps or ambiguity
+- 0.55–0.74: Moderate evidence; some criteria inferred rather than explicitly documented
+- 0.40–0.54: Significant ambiguity; key information is missing or contradictory
+- 0.00–0.39: Very poor evidence; cannot reliably determine coverage without more info
+
 Decision rules:
 - APPROVED: Patient meets at least ONE coverage criterion
 - DENIED: Patient meets NO coverage criteria AND has exclusion criteria (acute uncomplicated pain without neurological findings, no conservative therapy trial)
@@ -53,6 +60,13 @@ Return a JSON object:
   "justification": "A 2-3 paragraph clinical justification referencing specific findings from the note and conversation answers.",
   "confidence_score": 0.0-1.0
 }
+
+Confidence score calibration — use the FULL range, not just high values:
+- 0.90–1.00: All criteria clearly met/unmet with explicit, unambiguous documentation
+- 0.75–0.89: Most criteria well-supported but minor documentation gaps or ambiguity
+- 0.55–0.74: Moderate evidence; some criteria inferred rather than explicitly documented
+- 0.40–0.54: Significant ambiguity; key information is missing or contradictory
+- 0.00–0.39: Very poor evidence; cannot reliably determine coverage without more info
 
 Return ONLY valid JSON."""
 

@@ -263,3 +263,10 @@ The "Fetch from FHIR Server" feature connects directly to public FHIR R4 endpoin
 | Authenticated FHIR queries | ❌ Not implemented | Public HAPI sandbox only |
 
 **Gap**: The current implementation is suitable for demo purposes with public FHIR servers. Connecting to a real EHR (Epic, Cerner) would require SMART App Launch registration and token exchange.
+
+## Changelog
+
+### 2026-03-09
+- **fix**: Resolved A2A schema mismatch — `metadata` fields in `Message`, `Task`, and `SendTaskRequest` now accept `null` from the payer agent, eliminating the Pydantic `ValidationError` that caused all coverage evaluation polls to return HTTP 500 after ~8 seconds
+- **fix**: `_extract_fhir_and_policy` now correctly reads `policy_id` from `message.metadata` (where the backend sends it) in addition to `DataPart.data`
+- **feat**: Confidence score calibration added to all LLM evaluation prompts — scores now use the full 0–1 range instead of defaulting to 0.9
