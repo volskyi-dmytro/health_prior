@@ -133,8 +133,14 @@ class LLMService:
                     latency_ms = int((time.monotonic() - t0) * 1000)
                     data = response.json()
                     usage = data.get("usage", {})
+                    content = data["choices"][0]["message"]["content"]
+                    if not content or not content.strip():
+                        if attempt < retries - 1:
+                            await asyncio.sleep(2 ** attempt)
+                            continue
+                        raise RuntimeError("LLM returned empty response after retries")
                     return LLMCallResult(
-                        content=data["choices"][0]["message"]["content"],
+                        content=content,
                         prompt_tokens=usage.get("prompt_tokens"),
                         completion_tokens=usage.get("completion_tokens"),
                         latency_ms=latency_ms,
