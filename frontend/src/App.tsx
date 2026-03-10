@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { History } from 'lucide-react';
+import { History, BookOpen } from 'lucide-react';
 import { WizardProgress } from './components/WizardProgress';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { Step1_NoteInput } from './steps/Step1_NoteInput';
@@ -9,6 +9,7 @@ import { Step2_FHIRStructuring } from './steps/Step2_FHIRStructuring';
 import { Step3_CoverageDecision } from './steps/Step3_CoverageDecision';
 import { Step4_PriorAuth } from './steps/Step4_PriorAuth';
 import { HistoryPage } from './pages/HistoryPage';
+import { HowItWorksPage } from './pages/HowItWorksPage';
 import { structureNote, evaluateCoverage, generatePriorAuth, pollCoverageTask, submitCoverageReply, fetchFromFHIRServer, API_BASE } from './api/healthprior';
 import type { WizardStep, FHIRBundle, CoverageResult, PriorAuthPackage, A2ADataPart, A2ATextPart } from './types';
 
@@ -422,6 +423,12 @@ export default function App() {
             </Link>
 
             <div className="flex items-center gap-6">
+              <NavLink to="/how-it-works">
+                <span className="flex items-center gap-1.5">
+                  <BookOpen className="w-4 h-4" />
+                  How It Works
+                </span>
+              </NavLink>
               <NavLink to="/history">
                 <span className="flex items-center gap-1.5">
                   <History className="w-4 h-4" />
@@ -440,6 +447,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<WizardApp />} />
           <Route path="/history" element={<HistoryPage />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
         </Routes>
 
         {/* Footer */}
