@@ -101,10 +101,10 @@ POST `/notes/fetch-fhir` — MCP tool fetches a live patient record (Patient, Co
 ### Auth
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | /auth/login | GitHub OAuth login redirect |
+| GET | /auth/github | GitHub OAuth login redirect |
 | GET | /auth/callback | GitHub OAuth callback |
 | GET | /auth/me | Current session info |
-| POST | /auth/logout | Clear session |
+| GET | /auth/logout | Clear session |
 
 ### System
 | Method | Path | Description |
@@ -258,13 +258,18 @@ The "Fetch from FHIR Server" feature connects directly to public FHIR R4 endpoin
 | Requirement | Status | Notes |
 |-------------|--------|-------|
 | SMART launch sequence | ❌ Not implemented | GitHub OAuth used for user auth only |
-| `/.well-known/smart-configuration` | ❌ Not implemented | — |
+| `/.well-known/smart-configuration` | ✅ Stub implemented | Returns SMART on FHIR discovery document; token exchange not wired |
 | EHR launch context (`launch`, `patient` scopes) | ❌ Not implemented | — |
 | Authenticated FHIR queries | ❌ Not implemented | Public HAPI sandbox only |
 
 **Gap**: The current implementation is suitable for demo purposes with public FHIR servers. Connecting to a real EHR (Epic, Cerner) would require SMART App Launch registration and token exchange.
 
 ## Changelog
+
+### 2026-03-10
+- **fix**: Corrected README auth endpoint table — `/auth/login` → `/auth/github`, `/auth/logout` method `POST` → `GET`
+- **feat**: Added `/.well-known/smart-configuration` GET endpoint stub to backend (SMART on FHIR App Launch STU2 discovery document)
+- **fix**: MCP server `/.well-known/mcp.json` verified to include all 8 registered tools (`search_fhir_resources`, `get_structure_definition`, `fetch_patient_record` confirmed present)
 
 ### 2026-03-09
 - **fix**: Resolved A2A schema mismatch — `metadata` fields in `Message`, `Task`, and `SendTaskRequest` now accept `null` from the payer agent, eliminating the Pydantic `ValidationError` that caused all coverage evaluation polls to return HTTP 500 after ~8 seconds

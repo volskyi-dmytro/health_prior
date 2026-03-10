@@ -44,3 +44,24 @@ app.include_router(policies.router, dependencies=[Depends(require_auth)])
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "healthprior-backend", "version": "1.0.0"}
+
+
+@app.get("/.well-known/smart-configuration")
+async def smart_configuration():
+    """SMART on FHIR discovery document (stub).
+
+    Returns the RFC-8414-style authorization server metadata required by
+    SMART App Launch Framework STU2.  The current implementation uses
+    GitHub OAuth for user authentication only; this stub documents the
+    intended endpoints for future EHR integration.
+    """
+    issuer = settings.CORS_ORIGINS_LIST[0].rstrip("/")
+    return {
+        "issuer": issuer,
+        "authorization_endpoint": f"{issuer}/auth/github",
+        "token_endpoint": None,
+        "capabilities": ["launch-standalone", "client-public"],
+        "response_types_supported": ["code"],
+        "scopes_supported": ["openid", "profile", "launch", "patient/*.read"],
+        "grant_types_supported": ["authorization_code"],
+    }
