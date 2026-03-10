@@ -264,12 +264,43 @@ The "Fetch from FHIR Server" feature connects directly to public FHIR R4 endpoin
 
 **Gap**: The current implementation is suitable for demo purposes with public FHIR servers. Connecting to a real EHR (Epic, Cerner) would require SMART App Launch registration and token exchange.
 
+## Connecting to Claude
+
+The MCP server is accessible to AI clients over HTTP. Use the streamable-HTTP endpoint:
+
+```
+https://your-domain.com/mcp/mcp/
+```
+
+**Claude.ai** (web): Settings → Connectors → Add custom connector → paste the URL above.
+
+**Claude Desktop**: add to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "healthprior": {
+      "command": "npx",
+      "args": ["mcp-remote", "https://your-domain.com/mcp/mcp/"]
+    }
+  }
+}
+```
+
+The server implements RFC 9728 OAuth Protected Resource Metadata (`GET /.well-known/oauth-protected-resource`) and advertises no authentication requirement, so no token exchange is needed.
+
 ## Changelog
 
 ### 2026-03-10
+- **fix**: MCP server `StreamableHTTPSessionManager` task group now correctly initialized — injected `/health` and `/.well-known/*` routes directly into FastMCP's Starlette app instead of wrapping it in a separate FastAPI instance, which broke the session lifecycle and returned 500 on all MCP requests
+- **feat**: `GET /.well-known/oauth-protected-resource` (RFC 9728) added to MCP server — advertises no-auth to Claude.ai and `mcp-remote`; enables Claude Desktop and Claude.ai connector to connect without OAuth
+- **fix**: nginx `308` redirect added for `/mcp/mcp` → `/mcp/mcp/` (trailing-slash canonical form) so FastMCP's route is matched correctly by clients that omit the trailing slash
+- **fix**: nginx now listens on port 80 and 443 in a single server block — Cloudflare Flexible SSL mode forwards HTTP to origin, so the previous port-80 `301` redirect created an infinite loop for programmatic clients
+- **fix**: `healthprior-mcp` container is now managed by `docker compose` (was previously orphaned by `--remove-orphans` on each CI/CD run)
+- **fix**: CI/CD health checks now `exit 1` on timeout — a dead MCP, backend, or payer-agent container no longer produces a green deploy
+- **feat**: Added `GET /.well-known/smart-configuration` stub to backend (SMART on FHIR App Launch STU2 discovery document)
 - **fix**: Corrected README auth endpoint table — `/auth/login` → `/auth/github`, `/auth/logout` method `POST` → `GET`
-- **feat**: Added `/.well-known/smart-configuration` GET endpoint stub to backend (SMART on FHIR App Launch STU2 discovery document)
-- **fix**: MCP server `/.well-known/mcp.json` verified to include all 8 registered tools (`search_fhir_resources`, `get_structure_definition`, `fetch_patient_record` confirmed present)
+- **fix**: Replaced all hardcoded production domain references in code with `settings.PUBLIC_URL`; removed personal branding from frontend UI
 
 ### 2026-03-09
 - **fix**: Resolved A2A schema mismatch — `metadata` fields in `Message`, `Task`, and `SendTaskRequest` now accept `null` from the payer agent, eliminating the Pydantic `ValidationError` that caused all coverage evaluation polls to return HTTP 500 after ~8 seconds
