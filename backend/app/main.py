@@ -2,9 +2,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api import notes, coverage, prior_auth, policies
+from app.api import notes, coverage, prior_auth, policies, admin
 from app.auth.router import router as auth_router
-from app.auth.session import require_auth
+from app.auth.session import require_auth, require_ai_access
 
 
 @asynccontextmanager
@@ -34,11 +34,14 @@ app.add_middleware(
 # Auth router — unprotected
 app.include_router(auth_router)
 
-# Protected routers
-app.include_router(notes.router, dependencies=[Depends(require_auth)])
-app.include_router(coverage.router, dependencies=[Depends(require_auth)])
-app.include_router(prior_auth.router, dependencies=[Depends(require_auth)])
-app.include_router(policies.router, dependencies=[Depends(require_auth)])
+# Admin router — auth enforced per-endpoint via _require_admin
+app.include_router(admin.router)
+
+# AI-powered routers — require auth + AI access grant
+app.include_router(notes.router, dependencies=[Depends(require_ai_access)])
+app.include_router(coverage.router, dependencies=[Depends(require_ai_access)])
+app.include_router(prior_auth.router, dependencies=[Depends(require_ai_access)])
+app.include_router(policies.router, dependencies=[Depends(require_ai_access)])
 
 
 @app.get("/health")

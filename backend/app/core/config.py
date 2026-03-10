@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     GITHUB_OAUTH_CLIENT_SECRET: str = ""
     SESSION_SECRET_KEY: str = "dev-insecure-key-change-in-production"
     ADMIN_GITHUB_EMAIL: str = ""
+    ADMIN_GITHUB_LOGIN: str = ""
     ENABLE_PDF_EXPORT: bool = True
     FHIR_SERVER_URL: str = "https://hapi.fhir.org/baseR4"
 

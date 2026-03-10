@@ -80,6 +80,14 @@ export interface AuthUser {
   login?: string;
   avatar_url?: string;
   email?: string;
+  is_admin?: boolean;
+  ai_access?: boolean;
+}
+
+export interface AllowedUser {
+  github_login: string;
+  approved_by: string;
+  granted_at: string;
 }
 
 export const getMe = () =>
@@ -87,3 +95,12 @@ export const getMe = () =>
 
 export const loginUrl = () => `${API_BASE}/auth/github`;
 export const logoutUrl = () => `${API_BASE}/auth/logout`;
+
+export const listAllowedUsers = () =>
+  fetchJSON<AllowedUser[]>(`${API_BASE}/admin/users`);
+
+export const grantAiAccess = (login: string) =>
+  fetchJSON<{ status: string }>(`${API_BASE}/admin/users/${encodeURIComponent(login)}`, { method: 'POST' });
+
+export const revokeAiAccess = (login: string) =>
+  fetchJSON<{ status: string }>(`${API_BASE}/admin/users/${encodeURIComponent(login)}`, { method: 'DELETE' });

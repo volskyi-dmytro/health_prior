@@ -1,8 +1,11 @@
 import httpx
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
 from fastapi.responses import RedirectResponse, JSONResponse
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import text
 from app.core.config import settings
 from app.auth.session import set_session, clear_session, get_current_user
+from app.db.database import get_db
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -57,20 +60,13 @@ async def github_callback(request: Request, code: str = "", error: str = ""):
         (e["email"] for e in emails if e.get("primary") and e.get("verified")),
         None,
     )
-    if not settings.ADMIN_GITHUB_EMAIL:
-        is_admin = True
-    else:
-        is_admin = bool(
-            primary_email and
-            primary_email.lower() == settings.ADMIN_GITHUB_EMAIL.lower()
-        )
-        if not is_admin:
-            return RedirectResponse(f"{FRONTEND_URL}?error=access_denied")
+    github_login = gh_user.get("login", "")
+    is_admin = bool(settings.ADMIN_GITHUB_LOGIN and github_login.lower() == settings.ADMIN_GITHUB_LOGIN.lower())
 
     response = RedirectResponse(FRONTEND_URL)
     set_session(response, {
         "github_user_id": gh_user.get("id"),
-        "github_login": gh_user.get("login", ""),
+        "github_login": github_login,
         "github_avatar_url": gh_user.get("avatar_url", ""),
         "github_email": primary_email,
         "is_admin": is_admin,
@@ -79,16 +75,27 @@ async def github_callback(request: Request, code: str = "", error: str = ""):
 
 
 @router.get("/me")
-async def me(request: Request):
+async def me(request: Request, db: AsyncSession = Depends(get_db)):
     """Return current session user or 401."""
     user = get_current_user(request)
     if not user:
         return JSONResponse({"authenticated": False}, status_code=401)
+    login = user.get("github_login", "")
+    is_admin = user.get("is_admin", False)
+    ai_access = is_admin
+    if not ai_access:
+        result = await db.execute(
+            text("SELECT 1 FROM allowed_users WHERE github_login = :login"),
+            {"login": login},
+        )
+        ai_access = result.fetchone() is not None
     return {
         "authenticated": True,
-        "login": user.get("github_login"),
+        "login": login,
         "avatar_url": user.get("github_avatar_url"),
         "email": user.get("github_email"),
+        "is_admin": is_admin,
+        "ai_access": ai_access,
     }
 
 

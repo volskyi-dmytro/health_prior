@@ -43,6 +43,25 @@ def require_auth(request: Request) -> dict:
     user = get_session(request)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
-    if settings.ADMIN_GITHUB_EMAIL and not user.get("is_admin"):
-        raise HTTPException(status_code=403, detail="Access denied")
+    return user
+
+
+async def require_ai_access(request: Request) -> dict:
+    """FastAPI dependency — raises 401/403 if user lacks AI feature access."""
+    from fastapi import HTTPException
+    from sqlalchemy import text
+    from app.db.database import AsyncSessionLocal
+    user = get_session(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    if user.get("is_admin"):
+        return user
+    login = user.get("github_login", "")
+    async with AsyncSessionLocal() as db:
+        result = await db.execute(
+            text("SELECT 1 FROM allowed_users WHERE github_login = :login"),
+            {"login": login},
+        )
+        if result.fetchone() is None:
+            raise HTTPException(status_code=403, detail="AI access not granted. Contact the admin.")
     return user

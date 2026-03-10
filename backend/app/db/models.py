@@ -29,6 +29,15 @@ class Policy(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
+class AllowedUser(Base):
+    """GitHub users granted AI feature access by the admin."""
+    __tablename__ = "allowed_users"
+
+    github_login: Mapped[str] = mapped_column(String(100), primary_key=True)
+    approved_by: Mapped[str] = mapped_column(String(100), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class AuditLog(Base):
     __tablename__ = "audit_log"
 

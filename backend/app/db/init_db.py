@@ -32,10 +32,17 @@ async def init_db():
     from sqlalchemy import text
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-        # Idempotent column migration — safe to run against existing databases
+        # Idempotent column migrations — safe to run against existing databases
         await conn.execute(text(
             "ALTER TABLE audit_log ADD COLUMN IF NOT EXISTS session_id TEXT"
         ))
+        await conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS allowed_users (
+                github_login VARCHAR(100) PRIMARY KEY,
+                approved_by VARCHAR(100) NOT NULL,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            )
+        """))
 
     async with AsyncSessionLocal() as session:
         await seed_policies(session)

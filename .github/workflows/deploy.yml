@@ -49,6 +49,7 @@ jobs:
           OPENROUTER_API_KEY: test_key
           SESSION_SECRET_KEY: test-session-secret-key-32chars!!
           ADMIN_GITHUB_EMAIL: test@example.com
+          ADMIN_GITHUB_LOGIN: test-admin
           GITHUB_OAUTH_CLIENT_ID: test_client_id
           GITHUB_OAUTH_CLIENT_SECRET: test_client_secret
         run: cd backend && pytest tests/ -v
@@ -153,8 +154,9 @@ jobs:
             docker pull stpunk47/healthprior-frontend:$IMAGE_TAG
             docker pull stpunk47/healthprior-payer-agent:$IMAGE_TAG
 
-            # Update .env IMAGE_TAG
+            # Update .env with IMAGE_TAG and ADMIN_GITHUB_LOGIN
             sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG=$IMAGE_TAG/" .env || echo "IMAGE_TAG=$IMAGE_TAG" >> .env
+            sed -i "s/^ADMIN_GITHUB_LOGIN=.*/ADMIN_GITHUB_LOGIN=${{ secrets.ADMIN_USER }}/" .env || echo "ADMIN_GITHUB_LOGIN=${{ secrets.ADMIN_USER }}" >> .env
 
             # Start all services (backend, mcp-server, frontend, payer-agent, postgres)
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
