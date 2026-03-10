@@ -12,10 +12,11 @@ interface Props {
   payerQuestion?: string;
   payerCriterion?: string;
   onSubmitPayerReply?: (answer: string) => void;
+  onCancel?: () => void;
   isLoading?: boolean;
 }
 
-export function Step3_CoverageDecision({ coverageResult, onNext, loading, payerQuestion, payerCriterion, onSubmitPayerReply, isLoading }: Props) {
+export function Step3_CoverageDecision({ coverageResult, onNext, loading, payerQuestion, payerCriterion, onSubmitPayerReply, onCancel, isLoading }: Props) {
   // While waiting for payer clarification (no result yet), show the question prompt
   if (payerQuestion && !coverageResult) {
     return (
@@ -46,6 +47,7 @@ export function Step3_CoverageDecision({ coverageResult, onNext, loading, payerQ
           question={payerQuestion}
           criterionAtStake={payerCriterion}
           onSubmit={onSubmitPayerReply ?? (() => {})}
+          onCancel={onCancel}
           isLoading={isLoading ?? false}
         />
       </motion.div>

@@ -375,6 +375,7 @@ function WizardApp() {
                 payerQuestion={payerQuestion ?? undefined}
                 payerCriterion={payerCriterion ?? undefined}
                 onSubmitPayerReply={handleSubmitPayerReply}
+                onCancel={handleReset}
                 isLoading={loading}
               />
             )}
@@ -390,6 +391,7 @@ function WizardApp() {
 
 export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
   useEffect(() => {
     getMe().then(u => setIsAdmin(!!u.is_admin));
   }, []);
@@ -411,7 +413,7 @@ export default function App() {
           style={{ background: 'rgba(6,11,19,0.5)', borderColor: 'rgba(255,255,255,0.08)', height: '72px', display: 'flex', alignItems: 'center', backdropFilter: 'blur(16px)' }}
         >
           <div className="max-w-5xl mx-auto w-full flex items-center justify-between">
-            <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Link to="/" onClick={() => setResetKey(k => k + 1)} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div
                 className="w-9 h-9 rounded-xl flex items-center justify-center"
                 style={{ background: 'linear-gradient(110deg, #FDB352 0%, #FC5D36 100%)' }}
@@ -459,7 +461,7 @@ export default function App() {
 
         {/* Routes */}
         <Routes>
-          <Route path="/" element={<WizardApp />} />
+          <Route path="/" element={<WizardApp key={resetKey} />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/admin" element={<AdminPage />} />

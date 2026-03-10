@@ -6,10 +6,11 @@ interface PayerQuestionProps {
   question: string;
   criterionAtStake?: string;
   onSubmit: (answer: string) => void;
+  onCancel?: () => void;
   isLoading: boolean;
 }
 
-export function PayerQuestion({ question, criterionAtStake, onSubmit, isLoading }: PayerQuestionProps) {
+export function PayerQuestion({ question, criterionAtStake, onSubmit, onCancel, isLoading }: PayerQuestionProps) {
   const [answer, setAnswer] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -107,8 +108,28 @@ export function PayerQuestion({ question, criterionAtStake, onSubmit, isLoading 
         onBlur={e => { e.currentTarget.style.borderColor = 'rgba(251,191,36,0.5)'; }}
       />
 
-      {/* Submit button */}
-      <div className="flex justify-end mt-4">
+      {/* Actions */}
+      <div className="flex items-center justify-between mt-4">
+        {onCancel && (
+          <button
+            onClick={onCancel}
+            disabled={isLoading}
+            style={{
+              fontFamily: 'Instrument Sans, sans-serif',
+              fontSize: '13px',
+              color: 'rgba(255,255,255,0.4)',
+              background: 'none',
+              border: 'none',
+              cursor: isLoading ? 'not-allowed' : 'pointer',
+              padding: '4px 0',
+              transition: 'color 0.15s',
+            }}
+            onMouseEnter={e => { if (!isLoading) (e.currentTarget as HTMLButtonElement).style.color = '#FC5D36'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.4)'; }}
+          >
+            ← Cancel &amp; start over
+          </button>
+        )}
         <motion.button
           onClick={handleSubmit}
           disabled={isLoading || !answer.trim()}
@@ -123,6 +144,7 @@ export function PayerQuestion({ question, criterionAtStake, onSubmit, isLoading 
             color: isLoading || !answer.trim() ? '#9ca3af' : '#FFFFFF',
             cursor: isLoading || !answer.trim() ? 'not-allowed' : 'pointer',
             border: 'none',
+            marginLeft: 'auto',
           }}
         >
           {isLoading ? 'Submitting...' : 'Submit Answer'}
