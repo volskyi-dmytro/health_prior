@@ -289,36 +289,22 @@ async def get_structure_definition(resource_type: str) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Wrap MCP ASGI app in FastAPI to add /health and /.well-known/mcp.json routes
-# FastMCP's http_app() is a Starlette app whose lifespan initialises the
-# StreamableHTTPSessionManager task group.  We must forward that lifespan to
-# the outer FastAPI wrapper; otherwise every MCP request raises
-# "Task group is not initialized. Make sure to use run()."
+# Build the ASGI app: get FastMCP's Starlette app (which owns the lifespan
+# that initialises StreamableHTTPSessionManager) and inject our extra routes
+# directly so we never break the session manager lifecycle.
 # ---------------------------------------------------------------------------
-from contextlib import asynccontextmanager
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
-from starlette.routing import Mount
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+from starlette.routing import Route
 
-_mcp_asgi = mcp.http_app()
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    async with _mcp_asgi.router.lifespan_context(_mcp_asgi):
-        yield
+app = mcp.http_app()
 
 
-app = FastAPI(title="HealthPrior MCP Server", lifespan=lifespan)
-
-
-@app.get("/health")
-async def health():
+async def _health(request: Request):
     return JSONResponse({"status": "ok", "service": "healthprior-mcp"})
 
 
-@app.get("/.well-known/mcp.json")
-async def mcp_discovery():
+async def _mcp_discovery(request: Request):
     """Machine-readable MCP tool discovery document (Braman pattern)."""
     return JSONResponse({
         "schema_version": "1.0",
@@ -417,7 +403,10 @@ async def mcp_discovery():
     })
 
 
-app.mount("/", _mcp_asgi)
+# Inject /health and /.well-known/mcp.json as the first routes so they take
+# priority over the catch-all /mcp route registered by FastMCP.
+app.routes.insert(0, Route("/health", _health, methods=["GET", "HEAD"]))
+app.routes.insert(1, Route("/.well-known/mcp.json", _mcp_discovery, methods=["GET"]))
 
 
 if __name__ == "__main__":
