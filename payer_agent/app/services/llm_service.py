@@ -149,4 +149,7 @@ class LLMService:
             raw = raw.split("```")[1]
             if raw.startswith("json"):
                 raw = raw[4:]
-        return json.loads(raw.strip(), strict=False)
+        raw = raw.strip()
+        if not raw:
+            raise ValueError("LLM returned empty JSON content")
+        return json.loads(raw, strict=False)

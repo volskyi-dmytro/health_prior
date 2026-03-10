@@ -57,6 +57,24 @@ async def evaluate(
     """
     policy = _get_policy(policy_id)
 
+    # Short-circuit if the bundle has no clinical data to evaluate
+    clinical_types = {"Condition", "MedicationRequest", "Observation", "Procedure", "DiagnosticReport"}
+    entries = fhir_bundle.get("entry", [])
+    has_clinical_data = any(
+        (e.get("resourceType") or e.get("resource", {}).get("resourceType")) in clinical_types
+        for e in entries
+    )
+    if not has_clinical_data:
+        return {
+            "decision": "NEEDS_MORE_INFO",
+            "question": "The patient record contains no clinical data (conditions, medications, or observations). Please provide the relevant clinical history, diagnosis, or supporting documentation for this prior authorization request.",
+            "criterion_at_stake": "clinical_documentation",
+            "matched_criteria": [],
+            "unmet_criteria": [],
+            "justification": "Insufficient clinical data in the FHIR record to evaluate coverage criteria.",
+            "confidence_score": 0.0,
+        }
+
     if not history:
         # Initial evaluation
         user_prompt = (
