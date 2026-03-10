@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { History, BookOpen } from 'lucide-react';
+import { History, BookOpen, ShieldCheck } from 'lucide-react';
 import { WizardProgress } from './components/WizardProgress';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { Step1_NoteInput } from './steps/Step1_NoteInput';
@@ -10,7 +10,8 @@ import { Step3_CoverageDecision } from './steps/Step3_CoverageDecision';
 import { Step4_PriorAuth } from './steps/Step4_PriorAuth';
 import { HistoryPage } from './pages/HistoryPage';
 import { HowItWorksPage } from './pages/HowItWorksPage';
-import { structureNote, evaluateCoverage, generatePriorAuth, pollCoverageTask, submitCoverageReply, fetchFromFHIRServer, API_BASE } from './api/healthprior';
+import { AdminPage } from './pages/AdminPage';
+import { structureNote, evaluateCoverage, generatePriorAuth, pollCoverageTask, submitCoverageReply, fetchFromFHIRServer, getMe, API_BASE } from './api/healthprior';
 import type { WizardStep, FHIRBundle, CoverageResult, PriorAuthPackage, A2ADataPart, A2ATextPart } from './types';
 
 function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
@@ -388,6 +389,11 @@ function WizardApp() {
 }
 
 export default function App() {
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    getMe().then(u => setIsAdmin(!!u.is_admin));
+  }, []);
+
   return (
     <BrowserRouter>
       <div className="min-h-screen" style={{ background: 'transparent' }}>
@@ -435,6 +441,14 @@ export default function App() {
                   History
                 </span>
               </NavLink>
+              {isAdmin && (
+                <NavLink to="/admin">
+                  <span className="flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4" />
+                    Admin
+                  </span>
+                </NavLink>
+              )}
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#FC5D36' }} />
                 <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>MCP Connected</span>
@@ -448,6 +462,7 @@ export default function App() {
           <Route path="/" element={<WizardApp />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Routes>
 
         {/* Footer */}
