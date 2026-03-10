@@ -7,11 +7,13 @@ os.environ["TESTING"] = "true"
 os.environ["OPENROUTER_API_KEY"] = "test_key"
 os.environ["DATABASE_URL"] = "postgresql+asyncpg://healthprior:testpass@localhost:5432/healthprior_test"
 
-from app.auth.session import require_auth
+from app.auth.session import require_auth, require_ai_access
 from app.main import app
 from app.models.schemas import FHIRBundle
 
-app.dependency_overrides[require_auth] = lambda: {"github_login": "test", "is_admin": True}
+_test_user = {"github_login": "test", "is_admin": True}
+app.dependency_overrides[require_auth] = lambda: _test_user
+app.dependency_overrides[require_ai_access] = lambda: _test_user
 
 
 @pytest.fixture
@@ -195,19 +197,24 @@ def test_sample_notes_completeness():
 async def test_protected_route_requires_auth(client):
     """Without auth override, protected routes should return 401."""
     app.dependency_overrides.pop(require_auth, None)
+    app.dependency_overrides.pop(require_ai_access, None)
     response = await client.get("/notes/samples")
     assert response.status_code == 401
-    app.dependency_overrides[require_auth] = lambda: {"github_login": "test", "is_admin": True}
+    app.dependency_overrides[require_auth] = lambda: _test_user
+    app.dependency_overrides[require_ai_access] = lambda: _test_user
 
 @pytest.mark.anyio
 async def test_health_unprotected(client):
     app.dependency_overrides.pop(require_auth, None)
+    app.dependency_overrides.pop(require_ai_access, None)
     response = await client.get("/health")
     assert response.status_code == 200
-    app.dependency_overrides[require_auth] = lambda: {"github_login": "test", "is_admin": True}
+    app.dependency_overrides[require_auth] = lambda: _test_user
+    app.dependency_overrides[require_ai_access] = lambda: _test_user
 
 @pytest.mark.anyio
 async def test_auth_me_unauthenticated(client):
     app.dependency_overrides.pop(require_auth, None)
+    app.dependency_overrides.pop(require_ai_access, None)
     response = await client.get("/auth/me")
     assert response.status_code == 401
