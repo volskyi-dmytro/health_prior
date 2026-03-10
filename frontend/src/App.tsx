@@ -22,12 +22,12 @@ function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
         fontFamily: 'Instrument Sans, sans-serif',
         fontSize: '14px',
         fontWeight: isActive ? 600 : 400,
-        color: isActive ? '#FC5D36' : '#363636',
+        color: isActive ? '#FC5D36' : 'rgba(255,255,255,0.6)',
         textDecoration: 'none',
         transition: 'color 0.15s',
       }}
       onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = '#FC5D36'; }}
-      onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = '#363636'; }}
+      onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.6)'; }}
     >
       {children}
     </Link>
@@ -389,11 +389,11 @@ function WizardApp() {
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen" style={{ background: '#FAF9F5' }}>
+      <div className="min-h-screen" style={{ background: 'transparent' }}>
         {/* Announcement bar */}
         <div
           className="w-full text-center py-2 px-4 text-sm"
-          style={{ background: '#F9BA54', fontFamily: 'Instrument Sans, sans-serif', color: '#000' }}
+          style={{ background: 'rgba(249,186,84,0.12)', borderBottom: '1px solid rgba(249,186,84,0.2)', fontFamily: 'Instrument Sans, sans-serif', color: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
         >
           Prior authorization automation powered by clinical AI — Molina MCR-621 · CPT 72148 · FHIR R4
         </div>
@@ -401,7 +401,7 @@ export default function App() {
         {/* Navigation */}
         <header
           className="sticky top-0 z-50 border-b px-6"
-          style={{ background: '#FFFFFF', borderColor: '#e5e7eb', height: '72px', display: 'flex', alignItems: 'center' }}
+          style={{ background: 'rgba(6,11,19,0.5)', borderColor: 'rgba(255,255,255,0.08)', height: '72px', display: 'flex', alignItems: 'center', backdropFilter: 'blur(16px)' }}
         >
           <div className="max-w-5xl mx-auto w-full flex items-center justify-between">
             <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -412,7 +412,7 @@ export default function App() {
                 <span style={{ color: '#fff', fontFamily: 'General Sans, sans-serif', fontWeight: 600, fontSize: '14px' }}>HP</span>
               </div>
               <div>
-                <span style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '18px', color: '#000' }}>
+                <span style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '18px', color: '#ffffff' }}>
                   HealthPrior
                 </span>
                 <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#FC5D36', marginLeft: '8px' }}>
@@ -430,7 +430,7 @@ export default function App() {
               </NavLink>
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#FC5D36' }} />
-                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#363636' }}>MCP Connected</span>
+                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>MCP Connected</span>
               </div>
             </div>
           </div>
@@ -443,7 +443,7 @@ export default function App() {
         </Routes>
 
         {/* Footer */}
-        <footer className="border-t px-6 py-6 mt-10" style={{ borderColor: '#e5e7eb', background: '#FFFFFF' }}>
+        <footer className="border-t px-6 py-6 mt-10" style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(6,11,19,0.5)', backdropFilter: 'blur(16px)' }}>
           <div className="max-w-5xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div
@@ -452,11 +452,11 @@ export default function App() {
               >
                 <span style={{ color: '#fff', fontSize: '11px', fontWeight: 600 }}>HP</span>
               </div>
-              <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#363636' }}>
+              <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.35)' }}>
                 HealthPrior — Latitude Health Assessment
               </span>
             </div>
-            <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#9ca3af' }}>
+            <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.35)' }}>
               Molina MCR-621 · CPT 72148 · FHIR R4
             </span>
           </div>

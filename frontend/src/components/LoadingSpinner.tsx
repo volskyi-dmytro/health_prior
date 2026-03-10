@@ -26,7 +26,7 @@ export function LoadingSpinner({ message = 'Processing...' }: Props) {
       </div>
       <p
         className="text-sm animate-pulse"
-        style={{ fontFamily: 'Instrument Sans, sans-serif', color: '#363636' }}
+        style={{ fontFamily: 'Instrument Sans, sans-serif', color: 'rgba(255,255,255,0.6)' }}
       >
         {message}
       </p>

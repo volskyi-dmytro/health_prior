@@ -22,7 +22,7 @@ export function WizardProgress({ current }: { current: WizardStep }) {
                   ? { background: '#FC5D36', borderColor: '#FC5D36', color: '#fff' }
                   : current === step.id
                   ? { background: 'transparent', borderColor: '#FC5D36', color: '#FC5D36', boxShadow: '0 0 12px rgba(252,93,54,0.3)' }
-                  : { background: 'transparent', borderColor: '#d1d5db', color: '#9ca3af' }
+                  : { background: 'transparent', borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.3)' }
               }
               animate={current === step.id ? { scale: [1, 1.05, 1] } : {}}
               transition={{ duration: 2, repeat: Infinity }}
@@ -38,7 +38,7 @@ export function WizardProgress({ current }: { current: WizardStep }) {
               style={{
                 fontFamily: 'Instrument Sans, sans-serif',
                 fontWeight: 500,
-                color: current >= step.id ? '#FC5D36' : '#9ca3af',
+                color: current >= step.id ? '#FC5D36' : 'rgba(255,255,255,0.35)',
               }}
             >
               {step.label}
@@ -47,7 +47,7 @@ export function WizardProgress({ current }: { current: WizardStep }) {
           {i < steps.length - 1 && (
             <div
               className="h-0.5 w-16 mx-2 mb-5 transition-colors"
-              style={{ background: current > step.id ? '#FC5D36' : '#e5e7eb' }}
+              style={{ background: current > step.id ? '#FC5D36' : 'rgba(255,255,255,0.12)' }}
             />
           )}
         </div>
