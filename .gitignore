@@ -32,7 +32,7 @@ CLAUDE.md
 prompts/
 
 # Validation documentation (internal use only)
-documentation/
+documentation/validation/
 
 # Editor
 .idea/
