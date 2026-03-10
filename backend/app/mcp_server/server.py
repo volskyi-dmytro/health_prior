@@ -290,14 +290,26 @@ async def get_structure_definition(resource_type: str) -> dict:
 
 # ---------------------------------------------------------------------------
 # Wrap MCP ASGI app in FastAPI to add /health and /.well-known/mcp.json routes
+# FastMCP's http_app() is a Starlette app whose lifespan initialises the
+# StreamableHTTPSessionManager task group.  We must forward that lifespan to
+# the outer FastAPI wrapper; otherwise every MCP request raises
+# "Task group is not initialized. Make sure to use run()."
 # ---------------------------------------------------------------------------
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from starlette.routing import Mount
 
 _mcp_asgi = mcp.http_app()
 
-app = FastAPI(title="HealthPrior MCP Server")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with _mcp_asgi.router.lifespan_context(_mcp_asgi):
+        yield
+
+
+app = FastAPI(title="HealthPrior MCP Server", lifespan=lifespan)
 
 
 @app.get("/health")
