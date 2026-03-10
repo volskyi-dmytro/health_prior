@@ -65,7 +65,7 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
       transition={{ duration: 0.4 }}
       className="max-w-3xl mx-auto"
     >
-      <div className="text-center mb-8">
+      <div className="text-center mb-6">
         <div
           className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4"
           style={{ background: 'rgba(252,93,54,0.1)', border: '1px solid rgba(252,93,54,0.25)' }}
@@ -80,6 +80,34 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
         <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: '#6b7280' }}>
           Paste a clinical note or fetch from a FHIR server to begin prior authorization analysis
         </p>
+      </div>
+
+      {/* Contextual image strip */}
+      <div
+        className="relative w-full rounded-xl overflow-hidden mb-6 flex"
+        style={{ height: '100px', border: '1px solid #e5e7eb' }}
+      >
+        <img
+          src="https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800&q=80&auto=format&fit=crop"
+          alt="Lumbar spine MRI"
+          style={{ width: '160px', height: '100%', objectFit: 'cover', objectPosition: 'center', flexShrink: 0 }}
+        />
+        <div
+          className="flex items-center gap-8 px-6"
+          style={{ background: '#fff', flex: 1 }}
+        >
+          {[
+            { label: 'Policy', value: 'Molina MCR-621' },
+            { label: 'Procedure', value: 'Lumbar Spine MRI' },
+            { label: 'CPT Code', value: '72148' },
+            { label: 'Protocol', value: 'FHIR R4 · A2A' },
+          ].map(({ label, value }) => (
+            <div key={label}>
+              <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '10px', fontWeight: 600, color: '#9ca3af', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '4px' }}>{label}</div>
+              <div style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '13px', color: '#111' }}>{value}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Tab switcher */}

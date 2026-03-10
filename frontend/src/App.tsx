@@ -280,6 +280,39 @@ function WizardApp() {
 
   return (
     <main className="max-w-5xl mx-auto px-6 py-10">
+      {step === 1 && (
+        <div
+          className="relative w-full rounded-2xl overflow-hidden mb-8"
+          style={{ height: '200px' }}
+        >
+          <img
+            src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1400&q=80&auto=format&fit=crop"
+            alt="MRI Scanner"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: 'center 40%' }}
+          />
+          <div
+            className="absolute inset-0 flex flex-col justify-center px-10"
+            style={{ background: 'linear-gradient(to right, rgba(6,11,19,0.88) 45%, rgba(6,11,19,0.25))' }}
+          >
+            <div
+              className="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-full w-fit"
+              style={{ background: 'rgba(252,93,54,0.2)', border: '1px solid rgba(252,93,54,0.4)' }}
+            >
+              <span style={{ fontSize: '11px', color: '#FC5D36', fontFamily: 'Inter, sans-serif', fontWeight: 600, letterSpacing: '0.05em' }}>
+                CLINICAL AI · PRIOR AUTHORIZATION
+              </span>
+            </div>
+            <h1 style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 600, fontSize: '24px', color: '#fff', margin: 0, lineHeight: 1.2 }}>
+              Lumbar Spine MRI Authorization
+            </h1>
+            <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: 'rgba(255,255,255,0.65)', marginTop: '6px' }}>
+              Molina MCR-621 · CPT 72148 · FHIR R4 · A2A Protocol
+            </p>
+          </div>
+        </div>
+      )}
+
       <WizardProgress current={step} />
 
       {error && (

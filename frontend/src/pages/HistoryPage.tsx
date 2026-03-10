@@ -202,6 +202,32 @@ export function HistoryPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10">
+      {/* Hero banner */}
+      <div className="relative w-full rounded-2xl overflow-hidden mb-8" style={{ height: '160px' }}>
+        <img
+          src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=1400&q=80&auto=format&fit=crop"
+          alt="Medical records"
+          className="w-full h-full object-cover"
+          style={{ objectPosition: 'center 60%' }}
+        />
+        <div
+          className="absolute inset-0 flex items-center px-8"
+          style={{ background: 'linear-gradient(to right, rgba(6,11,19,0.85) 50%, rgba(6,11,19,0.2))' }}
+        >
+          <div>
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '11px', fontWeight: 600, color: '#FC5D36', letterSpacing: '0.08em', marginBottom: '6px' }}>
+              PRIOR AUTH SUBMISSIONS
+            </p>
+            <h2 style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 600, fontSize: '22px', color: '#fff', margin: 0 }}>
+              Submission History
+            </h2>
+            <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.6)', marginTop: '4px' }}>
+              {submissions.length} total · Molina MCR-621 · CPT 72148
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
