@@ -47,23 +47,23 @@ function BundleColumn({ fhirBundle, label }: { fhirBundle: FHIRBundle; label?: s
             </span>
             <div className="mt-2 space-y-1">
               {demo.name && (
-                <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#060B13' }}>
-                  <span style={{ color: '#9ca3af' }}>Name: </span>{demo.name}
+                <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#ffffff' }}>
+                  <span style={{ color: 'rgba(255,255,255,0.4)' }}>Name: </span>{demo.name}
                 </p>
               )}
               {demo.dob && (
-                <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#060B13' }}>
-                  <span style={{ color: '#9ca3af' }}>DOB: </span>{demo.dob}
+                <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#ffffff' }}>
+                  <span style={{ color: 'rgba(255,255,255,0.4)' }}>DOB: </span>{demo.dob}
                 </p>
               )}
               {demo.mrn && (
-                <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#060B13' }}>
-                  <span style={{ color: '#9ca3af' }}>MRN: </span>{demo.mrn}
+                <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#ffffff' }}>
+                  <span style={{ color: 'rgba(255,255,255,0.4)' }}>MRN: </span>{demo.mrn}
                 </p>
               )}
               {demo.gender && (
-                <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#060B13' }}>
-                  <span style={{ color: '#9ca3af' }}>Gender: </span>{demo.gender}
+                <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#ffffff' }}>
+                  <span style={{ color: 'rgba(255,255,255,0.4)' }}>Gender: </span>{demo.gender}
                 </p>
               )}
             </div>
@@ -77,7 +77,7 @@ function BundleColumn({ fhirBundle, label }: { fhirBundle: FHIRBundle; label?: s
         {fhirBundle.entry.length === 0 && (
           <p
             className="text-center py-8"
-            style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#9ca3af' }}
+            style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: 'rgba(255,255,255,0.4)' }}
           >
             No FHIR resources extracted.
           </p>
@@ -105,11 +105,11 @@ export function Step2_FHIRStructuring({ fhirBundle, fhirBundleB, modelALabel, mo
           <Layers className="w-7 h-7" style={{ color: '#FDB352' }} />
         </div>
         <h2
-          style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '28px', color: '#000', marginBottom: '8px' }}
+          style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '28px', color: '#ffffff', marginBottom: '8px' }}
         >
           FHIR Structuring
         </h2>
-        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: '#6b7280' }}>
+        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: 'rgba(255,255,255,0.5)' }}>
           {compareMode
             ? 'Side-by-side model comparison of FHIR R4 extraction'
             : 'Clinical note structured into FHIR R4 resources with source citations'}
@@ -119,26 +119,26 @@ export function Step2_FHIRStructuring({ fhirBundle, fhirBundleB, modelALabel, mo
       {compareMode ? (
         /* Two-column comparison layout */
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="rounded-xl p-4" style={{ background: '#FFFFFF', border: '1px solid #e5e7eb' }}>
+          <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
             <BundleColumn fhirBundle={fhirBundle} label={modelALabel || 'Model A'} />
           </div>
-          <div className="rounded-xl p-4" style={{ background: '#FFFFFF', border: '1px solid #e5e7eb' }}>
+          <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
             <BundleColumn fhirBundle={fhirBundleB} label={modelBLabel || 'Model B'} />
           </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left: raw note */}
-          <div className="rounded-xl p-4" style={{ background: '#FFFFFF', border: '1px solid #e5e7eb' }}>
+          <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
             <h3
               className="uppercase tracking-wider mb-3"
-              style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af' }}
+              style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}
             >
               Raw Clinical Note
             </h3>
             <div
               className="overflow-auto max-h-[500px] whitespace-pre-wrap leading-relaxed"
-              style={{ fontFamily: 'Inter, monospace', fontSize: '12px', color: '#363636' }}
+              style={{ fontFamily: 'Inter, monospace', fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}
             >
               {rawNote}
             </div>

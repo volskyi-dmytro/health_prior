@@ -23,7 +23,7 @@ const decisionColors: Record<string, { bg: string; text: string; border: string 
 
 function DecisionPill({ decision }: { decision: string | null }) {
   const d = decision || 'UNKNOWN';
-  const style = decisionColors[d] || { bg: '#f3f4f6', text: '#6b7280', border: '#e5e7eb' };
+  const style = decisionColors[d] || { bg: 'rgba(255,255,255,0.08)', text: 'rgba(255,255,255,0.5)', border: 'rgba(255,255,255,0.15)' };
   return (
     <span
       className="inline-flex items-center px-2.5 py-0.5 rounded-[100px] text-xs font-semibold"
@@ -56,18 +56,21 @@ function DetailModal({ submission, onClose }: { submission: Submission; onClose:
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.2 }}
           className="rounded-2xl w-full max-w-lg"
-          style={{ background: '#FFFFFF', border: '1px solid #e5e7eb', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}
+          style={{ background: 'rgba(10,15,26,0.95)', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 20px 60px rgba(0,0,0,0.6)', backdropFilter: 'blur(20px)' }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: '#e5e7eb' }}>
-            <h3 style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '18px', color: '#000' }}>
+          <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+            <h3 style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '18px', color: '#ffffff' }}>
               Submission Detail
             </h3>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:bg-gray-100"
+              className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+              style={{ background: 'rgba(255,255,255,0.06)' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.12)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; }}
             >
-              <X className="w-4 h-4" style={{ color: '#6b7280' }} />
+              <X className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.5)' }} />
             </button>
           </div>
           <div className="p-6 space-y-4">
@@ -75,29 +78,29 @@ function DetailModal({ submission, onClose }: { submission: Submission; onClose:
               <div>
                 <span
                   className="block uppercase tracking-wider mb-1"
-                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '10px', fontWeight: 600, color: '#9ca3af' }}
+                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}
                 >
                   Submission ID
                 </span>
-                <span style={{ fontFamily: 'Inter, monospace', fontSize: '12px', color: '#363636' }}>
+                <span style={{ fontFamily: 'Inter, monospace', fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>
                   {submission.id}
                 </span>
               </div>
               <div>
                 <span
                   className="block uppercase tracking-wider mb-1"
-                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '10px', fontWeight: 600, color: '#9ca3af' }}
+                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}
                 >
                   Date
                 </span>
-                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#363636' }}>
+                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.8)' }}>
                   {new Date(submission.created_at).toLocaleString()}
                 </span>
               </div>
               <div>
                 <span
                   className="block uppercase tracking-wider mb-1"
-                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '10px', fontWeight: 600, color: '#9ca3af' }}
+                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}
                 >
                   Decision
                 </span>
@@ -107,11 +110,11 @@ function DetailModal({ submission, onClose }: { submission: Submission; onClose:
                 <div>
                   <span
                     className="block uppercase tracking-wider mb-1"
-                    style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '10px', fontWeight: 600, color: '#9ca3af' }}
+                    style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}
                   >
                     Confidence
                   </span>
-                  <span style={{ fontFamily: 'Inter, monospace', fontSize: '14px', color: '#363636' }}>
+                  <span style={{ fontFamily: 'Inter, monospace', fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>
                     {Math.round(submission.confidence_score * 100)}%
                   </span>
                 </div>
@@ -120,11 +123,11 @@ function DetailModal({ submission, onClose }: { submission: Submission; onClose:
                 <div className="col-span-2">
                   <span
                     className="block uppercase tracking-wider mb-1"
-                    style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '10px', fontWeight: 600, color: '#9ca3af' }}
+                    style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}
                   >
                     Policy
                   </span>
-                  <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#363636' }}>
+                  <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.8)' }}>
                     {submission.policy}
                   </span>
                 </div>
@@ -133,17 +136,17 @@ function DetailModal({ submission, onClose }: { submission: Submission; onClose:
             <div>
               <span
                 className="block uppercase tracking-wider mb-2"
-                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '10px', fontWeight: 600, color: '#9ca3af' }}
+                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}
               >
                 Note Preview
               </span>
               <div
                 className="rounded-xl p-3 text-xs leading-relaxed"
                 style={{
-                  background: '#FAF9F5',
-                  border: '1px solid #e5e7eb',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
                   fontFamily: 'Inter, monospace',
-                  color: '#363636',
+                  color: 'rgba(255,255,255,0.8)',
                   maxHeight: '160px',
                   overflowY: 'auto',
                 }}
@@ -238,10 +241,10 @@ export function HistoryPage() {
             <History className="w-6 h-6" style={{ color: '#FC5D36' }} />
           </div>
           <div>
-            <h1 style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '24px', color: '#000' }}>
+            <h1 style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '24px', color: '#ffffff' }}>
               Submission History
             </h1>
-            <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#6b7280' }}>
+            <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>
               {submissions.length} total submissions
             </p>
           </div>
@@ -258,7 +261,7 @@ export function HistoryPage() {
 
       {/* Filters */}
       <div className="flex items-center gap-2 mb-6">
-        <Filter className="w-4 h-4" style={{ color: '#9ca3af' }} />
+        <Filter className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.4)' }} />
         <div className="flex gap-2">
           {filterButtons.map((f) => (
             <button
@@ -269,9 +272,9 @@ export function HistoryPage() {
                 fontFamily: 'Instrument Sans, sans-serif',
                 fontSize: '13px',
                 fontWeight: filter === f ? 600 : 400,
-                background: filter === f ? '#FC5D36' : '#FFFFFF',
-                color: filter === f ? '#FFFFFF' : '#6b7280',
-                border: filter === f ? '1px solid #FC5D36' : '1px solid #e5e7eb',
+                background: filter === f ? '#FC5D36' : 'rgba(255,255,255,0.06)',
+                color: filter === f ? '#FFFFFF' : 'rgba(255,255,255,0.5)',
+                border: filter === f ? '1px solid #FC5D36' : '1px solid rgba(255,255,255,0.12)',
               }}
             >
               {f === 'ALL' ? 'All' : f === 'NEEDS_MORE_INFO' ? 'Needs Info' : f.charAt(0) + f.slice(1).toLowerCase()}
@@ -284,7 +287,7 @@ export function HistoryPage() {
       {loading && (
         <div className="flex items-center justify-center py-20">
           <div className="w-8 h-8 border-2 border-[#FC5D36] border-t-transparent rounded-full animate-spin" />
-          <span className="ml-3" style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#6b7280' }}>
+          <span className="ml-3" style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>
             Loading history...
           </span>
         </div>
@@ -300,18 +303,18 @@ export function HistoryPage() {
       )}
 
       {!loading && !error && (
-        <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #e5e7eb', background: '#FFFFFF' }}>
+        <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }}>
           {filtered.length === 0 ? (
             <div className="text-center py-16">
-              <History className="w-10 h-10 mx-auto mb-3" style={{ color: '#d1d5db' }} />
-              <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#9ca3af' }}>
+              <History className="w-10 h-10 mx-auto mb-3" style={{ color: 'rgba(255,255,255,0.2)' }} />
+              <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: 'rgba(255,255,255,0.4)' }}>
                 No submissions found.
               </p>
             </div>
           ) : (
             <table className="w-full">
               <thead>
-                <tr style={{ background: '#FAF9F5', borderBottom: '1px solid #e5e7eb' }}>
+                <tr style={{ background: 'rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
                   {['Date', 'Patient ID', 'Policy', 'Decision', 'Confidence', ''].map((h) => (
                     <th
                       key={h}
@@ -320,7 +323,7 @@ export function HistoryPage() {
                         fontFamily: 'Instrument Sans, sans-serif',
                         fontSize: '11px',
                         fontWeight: 600,
-                        color: '#9ca3af',
+                        color: 'rgba(255,255,255,0.4)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
                       }}
@@ -339,28 +342,28 @@ export function HistoryPage() {
                     transition={{ delay: i * 0.04 }}
                     onClick={() => setSelected(s)}
                     className="cursor-pointer transition-colors"
-                    style={{ borderBottom: '1px solid #f3f4f6' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(252,93,54,0.03)'; }}
+                    style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(252,93,54,0.06)'; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ''; }}
                   >
                     <td className="px-5 py-3.5">
-                      <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#363636' }}>
+                      <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.8)' }}>
                         {new Date(s.created_at).toLocaleDateString()}
                       </span>
                       <span
                         className="block"
-                        style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', color: '#9ca3af' }}
+                        style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}
                       >
                         {new Date(s.created_at).toLocaleTimeString()}
                       </span>
                     </td>
                     <td className="px-5 py-3.5">
-                      <span style={{ fontFamily: 'Inter, monospace', fontSize: '12px', color: '#363636' }}>
+                      <span style={{ fontFamily: 'Inter, monospace', fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>
                         {s.patient_id || s.id.slice(0, 8)}
                       </span>
                     </td>
                     <td className="px-5 py-3.5">
-                      <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#363636' }}>
+                      <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.8)' }}>
                         {s.policy || 'MCR-621'}
                       </span>
                     </td>
@@ -368,14 +371,14 @@ export function HistoryPage() {
                       <DecisionPill decision={s.decision} />
                     </td>
                     <td className="px-5 py-3.5">
-                      <span style={{ fontFamily: 'Inter, monospace', fontSize: '13px', color: '#363636' }}>
+                      <span style={{ fontFamily: 'Inter, monospace', fontSize: '13px', color: 'rgba(255,255,255,0.8)' }}>
                         {s.confidence_score !== undefined
                           ? `${Math.round(s.confidence_score * 100)}%`
                           : '—'}
                       </span>
                     </td>
                     <td className="px-5 py-3.5">
-                      <ExternalLink className="w-4 h-4" style={{ color: '#d1d5db' }} />
+                      <ExternalLink className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.2)' }} />
                     </td>
                   </motion.tr>
                 ))}

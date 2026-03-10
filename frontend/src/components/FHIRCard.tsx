@@ -78,17 +78,17 @@ export function FHIRCard({ resource, index }: Props) {
             {icdCode && (
               <span
                 className="px-1.5 py-0.5 rounded-md"
-                style={{ fontFamily: 'Inter, monospace', fontSize: '10px', background: 'rgba(0,0,0,0.06)', color: '#363636' }}
+                style={{ fontFamily: 'Inter, monospace', fontSize: '10px', background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.7)' }}
               >
                 {icdCode}
               </span>
             )}
           </div>
-          <p className="text-sm font-medium leading-snug" style={{ fontFamily: 'Instrument Sans, sans-serif', color: '#060B13' }}>
+          <p className="text-sm font-medium leading-snug" style={{ fontFamily: 'Instrument Sans, sans-serif', color: '#ffffff' }}>
             {title}
           </p>
           {detail && (
-            <p className="text-xs mt-1 leading-relaxed" style={{ fontFamily: 'Instrument Sans, sans-serif', color: '#6b7280' }}>
+            <p className="text-xs mt-1 leading-relaxed" style={{ fontFamily: 'Instrument Sans, sans-serif', color: 'rgba(255,255,255,0.55)' }}>
               {detail}
             </p>
           )}

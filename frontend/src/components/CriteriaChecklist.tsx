@@ -46,7 +46,7 @@ export function CriteriaChecklist({ matchedCriteria, unmetCriteria }: Props) {
     <div className="space-y-2">
       <h3
         className="uppercase tracking-wider mb-3"
-        style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af' }}
+        style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}
       >
         Molina MCR-621 — Coverage Criteria
       </h3>
@@ -60,18 +60,18 @@ export function CriteriaChecklist({ matchedCriteria, unmetCriteria }: Props) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.07, duration: 0.3 }}
             className="flex items-center gap-3 p-2.5 rounded-xl transition-all"
-            style={isMatched ? { background: 'rgba(253,179,82,0.12)', border: '1px solid rgba(253,179,82,0.35)' } : {}}
+            style={isMatched ? { background: 'rgba(253,179,82,0.1)', border: '1px solid rgba(253,179,82,0.3)' } : { background: 'rgba(255,255,255,0.03)' }}
           >
             {isMatched ? (
               <CheckCircle2 className="w-4 h-4 flex-shrink-0" style={{ color: '#FC5D36' }} />
             ) : (
-              <Circle className="w-4 h-4 flex-shrink-0" style={{ color: '#d1d5db' }} />
+              <Circle className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.2)' }} />
             )}
             <span
               className="text-sm"
               style={{
                 fontFamily: 'Instrument Sans, sans-serif',
-                color: isMatched ? '#060B13' : '#9ca3af',
+                color: isMatched ? '#ffffff' : 'rgba(255,255,255,0.4)',
                 fontWeight: isMatched ? 500 : 400,
               }}
             >
@@ -81,7 +81,7 @@ export function CriteriaChecklist({ matchedCriteria, unmetCriteria }: Props) {
         );
       })}
       {evaluated.length === 0 && (
-        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#9ca3af' }}>
+        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
           No criteria evaluated.
         </p>
       )}

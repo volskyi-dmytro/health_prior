@@ -68,16 +68,16 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
       <div className="text-center mb-6">
         <div
           className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4"
-          style={{ background: 'rgba(252,93,54,0.1)', border: '1px solid rgba(252,93,54,0.25)' }}
+          style={{ background: 'rgba(252,93,54,0.15)', border: '1px solid rgba(252,93,54,0.35)' }}
         >
           <Stethoscope className="w-7 h-7" style={{ color: '#FC5D36' }} />
         </div>
         <h2
-          style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '28px', color: '#000', marginBottom: '8px' }}
+          style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '28px', color: '#ffffff', marginBottom: '8px' }}
         >
           Clinical Note Input
         </h2>
-        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: '#6b7280' }}>
+        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: 'rgba(255,255,255,0.5)' }}>
           Paste a clinical note or fetch from a FHIR server to begin prior authorization analysis
         </p>
       </div>
@@ -85,7 +85,7 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
       {/* Contextual image strip */}
       <div
         className="relative w-full rounded-xl overflow-hidden mb-6 flex"
-        style={{ height: '100px', border: '1px solid #e5e7eb' }}
+        style={{ height: '100px', border: '1px solid rgba(255,255,255,0.1)' }}
       >
         <img
           src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=800&q=80&auto=format&fit=crop"
@@ -94,7 +94,7 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
         />
         <div
           className="flex items-center gap-8 px-6"
-          style={{ background: '#fff', flex: 1 }}
+          style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(16px)', flex: 1 }}
         >
           {[
             { label: 'Policy', value: 'Molina MCR-621' },
@@ -103,15 +103,15 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
             { label: 'Protocol', value: 'FHIR R4 · A2A' },
           ].map(({ label, value }) => (
             <div key={label}>
-              <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '10px', fontWeight: 600, color: '#9ca3af', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '4px' }}>{label}</div>
-              <div style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '13px', color: '#111' }}>{value}</div>
+              <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '4px' }}>{label}</div>
+              <div style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '13px', color: '#ffffff' }}>{value}</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Tab switcher */}
-      <div className="flex mb-5" style={{ borderBottom: '2px solid #e5e7eb' }}>
+      <div className="flex mb-5" style={{ borderBottom: '2px solid rgba(255,255,255,0.1)' }}>
         <button
           onClick={() => setActiveTab('paste')}
           className="flex items-center gap-2 px-4 py-2.5 transition-all"
@@ -119,7 +119,7 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
             fontFamily: 'Instrument Sans, sans-serif',
             fontSize: '14px',
             fontWeight: activeTab === 'paste' ? 600 : 400,
-            color: activeTab === 'paste' ? '#FC5D36' : '#6b7280',
+            color: activeTab === 'paste' ? '#FC5D36' : 'rgba(255,255,255,0.5)',
             borderBottom: activeTab === 'paste' ? '2px solid #FC5D36' : '2px solid transparent',
             marginBottom: '-2px',
             background: 'none',
@@ -136,7 +136,7 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
             fontFamily: 'Instrument Sans, sans-serif',
             fontSize: '14px',
             fontWeight: activeTab === 'fhir' ? 600 : 400,
-            color: activeTab === 'fhir' ? '#FC5D36' : '#6b7280',
+            color: activeTab === 'fhir' ? '#FC5D36' : 'rgba(255,255,255,0.5)',
             borderBottom: activeTab === 'fhir' ? '2px solid #FC5D36' : '2px solid transparent',
             marginBottom: '-2px',
             background: 'none',
@@ -149,12 +149,12 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
       </div>
 
       {/* Policy Selector */}
-      <div className="rounded-xl p-4 mb-4" style={{ background: '#FFFFFF', border: '1px solid #e5e7eb' }}>
+      <div className="rounded-xl p-4 mb-4" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
         <div className="flex items-center gap-2 mb-2">
-          <FileText className="w-4 h-4" style={{ color: '#9ca3af' }} />
+          <FileText className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.4)' }} />
           <span
             className="uppercase tracking-wider"
-            style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af' }}
+            style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}
           >
             Coverage Policy
           </span>
@@ -166,12 +166,12 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
           style={{
             fontFamily: 'Instrument Sans, sans-serif',
             fontSize: '14px',
-            color: '#363636',
-            background: '#FAF9F5',
-            border: '1px solid #e5e7eb',
+            color: '#ffffff',
+            background: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.15)',
           }}
           onFocus={e => { e.currentTarget.style.borderColor = 'rgba(252,93,54,0.5)'; }}
-          onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb'; }}
+          onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; }}
         >
           {policies.length === 0 && (
             <option value="MCR-621">Molina MCR-621: Lumbar Spine MRI</option>
@@ -189,7 +189,7 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
             <div className="grid grid-cols-1 gap-2 mb-4">
               <p
                 className="uppercase tracking-wider"
-                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af' }}
+                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}
               >
                 Load sample note:
               </p>
@@ -198,26 +198,26 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
                   key={s.id}
                   onClick={() => setNote(s.content)}
                   className="flex items-center justify-between p-4 rounded-xl text-left group transition-all"
-                  style={{ border: '1px solid #e5e7eb', background: '#FFFFFF' }}
+                  style={{ border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)' }}
                   onMouseEnter={e => {
                     (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(252,93,54,0.4)';
-                    (e.currentTarget as HTMLButtonElement).style.background = 'rgba(252,93,54,0.04)';
+                    (e.currentTarget as HTMLButtonElement).style.background = 'rgba(252,93,54,0.08)';
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = '#e5e7eb';
-                    (e.currentTarget as HTMLButtonElement).style.background = '#FFFFFF';
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.1)';
+                    (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.05)';
                   }}
                 >
                   <div>
                     <span
                       className="block"
-                      style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', fontWeight: 500, color: '#060B13' }}
+                      style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', fontWeight: 500, color: '#ffffff' }}
                     >
                       {s.title}
                     </span>
                     <span
                       className="block mt-0.5"
-                      style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#9ca3af' }}
+                      style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}
                     >
                       {s.description}
                     </span>
@@ -242,13 +242,13 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
             style={{
               fontFamily: 'Inter, monospace',
               fontSize: '13px',
-              color: '#060B13',
-              background: '#FFFFFF',
-              border: '1px solid #e5e7eb',
+              color: 'rgba(255,255,255,0.85)',
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.12)',
               lineHeight: '1.6',
             }}
-            onFocus={e => { e.currentTarget.style.borderColor = 'rgba(252,93,54,0.5)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(252,93,54,0.08)'; }}
-            onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.boxShadow = 'none'; }}
+            onFocus={e => { e.currentTarget.style.borderColor = 'rgba(252,93,54,0.5)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(252,93,54,0.1)'; }}
+            onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.boxShadow = 'none'; }}
           />
 
           {/* Compare models toggle */}
@@ -260,16 +260,16 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
                 fontFamily: 'Instrument Sans, sans-serif',
                 fontSize: '13px',
                 fontWeight: 500,
-                border: compareMode ? '1px solid rgba(252,93,54,0.5)' : '1px solid #e5e7eb',
-                background: compareMode ? 'rgba(252,93,54,0.08)' : '#FFFFFF',
-                color: compareMode ? '#FC5D36' : '#6b7280',
+                border: compareMode ? '1px solid rgba(252,93,54,0.5)' : '1px solid rgba(255,255,255,0.15)',
+                background: compareMode ? 'rgba(252,93,54,0.12)' : 'rgba(255,255,255,0.06)',
+                color: compareMode ? '#FC5D36' : 'rgba(255,255,255,0.5)',
               }}
             >
               <GitCompare className="w-3.5 h-3.5" />
               Compare Models
             </button>
             {compareMode && (
-              <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#9ca3af' }}>
+              <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
                 Side-by-side FHIR extraction comparison
               </span>
             )}
@@ -278,7 +278,7 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
           {/* Model picker + submit */}
           <div className="flex items-center gap-3 mt-2">
             <div className="flex items-center gap-2 flex-1">
-              <Cpu className="w-4 h-4 flex-shrink-0" style={{ color: '#9ca3af' }} />
+              <Cpu className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.4)' }} />
               <select
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
@@ -286,9 +286,9 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
                 style={{
                   fontFamily: 'Instrument Sans, sans-serif',
                   fontSize: '14px',
-                  color: '#363636',
-                  background: '#FFFFFF',
-                  border: '1px solid #e5e7eb',
+                  color: '#ffffff',
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.15)',
                 }}
               >
                 {MODELS.map((m) => (
@@ -297,7 +297,7 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
               </select>
               {compareMode && (
                 <>
-                  <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#9ca3af' }}>vs</span>
+                  <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>vs</span>
                   <select
                     value={modelB}
                     onChange={(e) => setModelB(e.target.value)}
@@ -305,9 +305,9 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
                     style={{
                       fontFamily: 'Instrument Sans, sans-serif',
                       fontSize: '14px',
-                      color: '#363636',
-                      background: '#FFFFFF',
-                      border: '1px solid #e5e7eb',
+                      color: '#ffffff',
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.15)',
                     }}
                   >
                     {MODELS.map((m) => (
@@ -339,15 +339,15 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
       )}
 
       {activeTab === 'fhir' && (
-        <div className="rounded-xl p-6" style={{ background: '#FFFFFF', border: '1px solid #e5e7eb' }}>
-          <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#6b7280', marginBottom: '20px' }}>
+        <div className="rounded-xl p-6" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
+          <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '20px' }}>
             Connects to a FHIR R4 server and retrieves Patient, Conditions, Medications, and Observations
           </p>
 
           <div className="flex flex-col gap-4">
             <div>
               <label
-                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', fontWeight: 600, color: '#9ca3af', display: 'block', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
               >
                 FHIR Server URL
               </label>
@@ -360,18 +360,18 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
                 style={{
                   fontFamily: 'Inter, monospace',
                   fontSize: '13px',
-                  color: '#060B13',
-                  background: '#FAF9F5',
-                  border: '1px solid #e5e7eb',
+                  color: 'rgba(255,255,255,0.85)',
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.12)',
                 }}
-                onFocus={e => { e.currentTarget.style.borderColor = 'rgba(252,93,54,0.5)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(252,93,54,0.08)'; }}
-                onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.boxShadow = 'none'; }}
+                onFocus={e => { e.currentTarget.style.borderColor = 'rgba(252,93,54,0.5)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(252,93,54,0.1)'; }}
+                onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.boxShadow = 'none'; }}
               />
             </div>
 
             <div>
               <label
-                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', fontWeight: 600, color: '#9ca3af', display: 'block', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
               >
                 Patient ID
               </label>
@@ -384,12 +384,12 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
                 style={{
                   fontFamily: 'Inter, monospace',
                   fontSize: '13px',
-                  color: '#060B13',
-                  background: '#FAF9F5',
-                  border: '1px solid #e5e7eb',
+                  color: 'rgba(255,255,255,0.85)',
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.12)',
                 }}
-                onFocus={e => { e.currentTarget.style.borderColor = 'rgba(252,93,54,0.5)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(252,93,54,0.08)'; }}
-                onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.boxShadow = 'none'; }}
+                onFocus={e => { e.currentTarget.style.borderColor = 'rgba(252,93,54,0.5)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(252,93,54,0.1)'; }}
+                onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.boxShadow = 'none'; }}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleFetchFromFHIR(); }}
               />
             </div>

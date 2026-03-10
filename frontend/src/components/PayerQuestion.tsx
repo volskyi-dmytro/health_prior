@@ -47,7 +47,7 @@ export function PayerQuestion({ question, criterionAtStake, onSubmit, isLoading 
             fontFamily: 'General Sans, sans-serif',
             fontWeight: 500,
             fontSize: '16px',
-            color: '#92400e',
+            color: '#FDB352',
           }}
         >
           Payer Needs Additional Information
@@ -63,7 +63,7 @@ export function PayerQuestion({ question, criterionAtStake, onSubmit, isLoading 
               fontFamily: 'Instrument Sans, sans-serif',
               fontWeight: 600,
               background: 'rgba(251,191,36,0.2)',
-              color: '#92400e',
+              color: '#FDB352',
               border: '1px solid rgba(251,191,36,0.4)',
             }}
           >
@@ -78,7 +78,7 @@ export function PayerQuestion({ question, criterionAtStake, onSubmit, isLoading 
         style={{
           fontFamily: 'Instrument Sans, sans-serif',
           fontSize: '15px',
-          color: '#363636',
+          color: 'rgba(255,255,255,0.8)',
           lineHeight: 1.65,
         }}
       >
@@ -97,9 +97,9 @@ export function PayerQuestion({ question, criterionAtStake, onSubmit, isLoading 
         style={{
           fontFamily: 'Instrument Sans, sans-serif',
           fontSize: '14px',
-          color: '#363636',
-          background: '#FFFFFF',
-          border: '1px solid rgba(251,191,36,0.5)',
+          color: 'rgba(255,255,255,0.85)',
+          background: 'rgba(255,255,255,0.07)',
+          border: '1px solid rgba(251,191,36,0.4)',
           outline: 'none',
           lineHeight: 1.6,
         }}
@@ -118,7 +118,7 @@ export function PayerQuestion({ question, criterionAtStake, onSubmit, isLoading 
           style={{
             fontFamily: 'Instrument Sans, sans-serif',
             background: isLoading || !answer.trim()
-              ? '#e5e7eb'
+              ? 'rgba(255,255,255,0.12)'
               : 'linear-gradient(110deg, #FDB352 0%, #FC5D36 100%)',
             color: isLoading || !answer.trim() ? '#9ca3af' : '#FFFFFF',
             cursor: isLoading || !answer.trim() ? 'not-allowed' : 'pointer',

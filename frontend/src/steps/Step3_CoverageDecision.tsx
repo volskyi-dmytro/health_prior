@@ -34,11 +34,11 @@ export function Step3_CoverageDecision({ coverageResult, onNext, loading, payerQ
             <Shield className="w-7 h-7" style={{ color: '#FC5D36' }} />
           </div>
           <h2
-            style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '28px', color: '#000', marginBottom: '8px' }}
+            style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '28px', color: '#ffffff', marginBottom: '8px' }}
           >
             Coverage Decision
           </h2>
-          <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: '#6b7280' }}>
+          <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: 'rgba(255,255,255,0.5)' }}>
             Molina Healthcare MCR-621 — Lumbar Spine MRI
           </p>
         </div>
@@ -74,11 +74,11 @@ export function Step3_CoverageDecision({ coverageResult, onNext, loading, payerQ
           <Shield className="w-7 h-7" style={{ color: '#FC5D36' }} />
         </div>
         <h2
-          style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '28px', color: '#000', marginBottom: '8px' }}
+          style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '28px', color: '#ffffff', marginBottom: '8px' }}
         >
           Coverage Decision
         </h2>
-        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: '#6b7280' }}>
+        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: 'rgba(255,255,255,0.5)' }}>
           Molina Healthcare MCR-621 — Lumbar Spine MRI
         </p>
       </div>
@@ -93,7 +93,7 @@ export function Step3_CoverageDecision({ coverageResult, onNext, loading, payerQ
         <div className="flex justify-between items-center mb-2">
           <span
             className="uppercase tracking-wider"
-            style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af' }}
+            style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}
           >
             Confidence Score
           </span>
@@ -101,7 +101,7 @@ export function Step3_CoverageDecision({ coverageResult, onNext, loading, payerQ
             {confidencePct}%
           </span>
         </div>
-        <div className="h-2 rounded-full overflow-hidden" style={{ background: '#f3f4f6' }}>
+        <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${confidencePct}%` }}
@@ -113,7 +113,7 @@ export function Step3_CoverageDecision({ coverageResult, onNext, loading, payerQ
       </div>
 
       {/* Criteria checklist */}
-      <div className="rounded-xl p-5 mb-6" style={{ background: '#FFFFFF', border: '1px solid #e5e7eb' }}>
+      <div className="rounded-xl p-5 mb-6" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
         <CriteriaChecklist
           matchedCriteria={coverageResult.matched_criteria}
           unmetCriteria={coverageResult.unmet_criteria}
@@ -121,14 +121,14 @@ export function Step3_CoverageDecision({ coverageResult, onNext, loading, payerQ
       </div>
 
       {/* LLM Justification */}
-      <div className="rounded-xl p-5 mb-6" style={{ background: '#FFF6EA', border: '1px solid rgba(253,179,82,0.3)' }}>
+      <div className="rounded-xl p-5 mb-6" style={{ background: 'rgba(253,179,82,0.08)', border: '1px solid rgba(253,179,82,0.2)' }}>
         <h3
           className="uppercase tracking-wider mb-3"
-          style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af' }}
+          style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}
         >
           Clinical Justification
         </h3>
-        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#363636', lineHeight: 1.7 }}>
+        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: 'rgba(255,255,255,0.8)', lineHeight: 1.7 }}>
           {coverageResult.justification}
         </p>
       </div>

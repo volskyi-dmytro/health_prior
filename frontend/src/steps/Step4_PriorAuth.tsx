@@ -28,7 +28,7 @@ function AuditTrailView({ submissionId }: { submissionId: string }) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="w-6 h-6 border-2 border-[#FC5D36] border-t-transparent rounded-full animate-spin" />
-        <span className="ml-3" style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#6b7280' }}>
+        <span className="ml-3" style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>
           Loading audit trail...
         </span>
       </div>
@@ -44,7 +44,7 @@ function AuditTrailView({ submissionId }: { submissionId: string }) {
         <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#FC5D36' }}>
           {error}
         </p>
-        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>
+        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '4px' }}>
           Audit endpoint may not be implemented yet.
         </p>
       </div>
@@ -59,27 +59,27 @@ function AuditTrailView({ submissionId }: { submissionId: string }) {
       {(audit.total_tokens != null || audit.total_latency_ms != null) && (
         <div className="grid grid-cols-2 gap-4 mb-5">
           {audit.total_tokens != null && (
-            <div className="rounded-xl p-4" style={{ background: '#FFFFFF', border: '1px solid #e5e7eb' }}>
+            <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
               <span
                 className="block uppercase tracking-wider mb-1"
-                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af' }}
+                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}
               >
                 Total Tokens
               </span>
-              <span style={{ fontFamily: 'Inter, monospace', fontSize: '20px', fontWeight: 600, color: '#060B13' }}>
+              <span style={{ fontFamily: 'Inter, monospace', fontSize: '20px', fontWeight: 600, color: '#ffffff' }}>
                 {audit.total_tokens.toLocaleString()}
               </span>
             </div>
           )}
           {audit.total_latency_ms != null && (
-            <div className="rounded-xl p-4" style={{ background: '#FFFFFF', border: '1px solid #e5e7eb' }}>
+            <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
               <span
                 className="block uppercase tracking-wider mb-1"
-                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af' }}
+                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}
               >
                 Total Latency
               </span>
-              <span style={{ fontFamily: 'Inter, monospace', fontSize: '20px', fontWeight: 600, color: '#060B13' }}>
+              <span style={{ fontFamily: 'Inter, monospace', fontSize: '20px', fontWeight: 600, color: '#ffffff' }}>
                 {(audit.total_latency_ms / 1000).toFixed(2)}s
               </span>
             </div>
@@ -90,7 +90,7 @@ function AuditTrailView({ submissionId }: { submissionId: string }) {
       {/* Entries */}
       <div className="space-y-3">
         {audit.entries.map((entry, i) => (
-          <div key={i} className="rounded-xl p-4" style={{ background: '#FFFFFF', border: '1px solid #e5e7eb' }}>
+          <div key={i} className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <div
@@ -99,7 +99,7 @@ function AuditTrailView({ submissionId }: { submissionId: string }) {
                 >
                   {i + 1}
                 </div>
-                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', fontWeight: 500, color: '#060B13' }}>
+                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', fontWeight: 500, color: '#ffffff' }}>
                   {entry.step}
                 </span>
                 {entry.tool && (
@@ -120,24 +120,24 @@ function AuditTrailView({ submissionId }: { submissionId: string }) {
                 )}
               </div>
               {entry.timestamp && (
-                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', color: '#9ca3af' }}>
+                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
                   {new Date(entry.timestamp).toLocaleTimeString()}
                 </span>
               )}
             </div>
             <div className="flex gap-4">
               {entry.input_tokens !== undefined && (
-                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#6b7280' }}>
+                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
                   In: <strong>{entry.input_tokens}</strong> tokens
                 </span>
               )}
               {entry.output_tokens !== undefined && (
-                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#6b7280' }}>
+                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
                   Out: <strong>{entry.output_tokens}</strong> tokens
                 </span>
               )}
               {entry.latency_ms !== undefined && (
-                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#6b7280' }}>
+                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
                   Latency: <strong>{(entry.latency_ms / 1000).toFixed(2)}s</strong>
                 </span>
               )}
@@ -147,7 +147,7 @@ function AuditTrailView({ submissionId }: { submissionId: string }) {
         {audit.entries.length === 0 && (
           <p
             className="text-center py-8"
-            style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#9ca3af' }}
+            style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: 'rgba(255,255,255,0.4)' }}
           >
             No audit entries recorded.
           </p>
@@ -196,17 +196,18 @@ export function Step4_PriorAuth({ priorAuth, onReset }: Props) {
           <FileText className="w-7 h-7" style={{ color: '#FC5D36' }} />
         </div>
         <h2
-          style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '28px', color: '#000', marginBottom: '8px' }}
+          style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '28px', color: '#ffffff', marginBottom: '8px' }}
         >
           Prior Auth Package
         </h2>
-        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: '#6b7280' }}>
+        <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: 'rgba(255,255,255,0.5)' }}>
           DaVinci PAS-inspired submission ready for payer
+
         </p>
       </div>
 
       {/* Tab bar */}
-      <div className="flex items-center gap-1 mb-6 p-1 rounded-xl" style={{ background: '#f3f4f6', width: 'fit-content', margin: '0 auto 24px' }}>
+      <div className="flex items-center gap-1 mb-6 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.06)', width: 'fit-content', margin: '0 auto 24px' }}>
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -216,10 +217,10 @@ export function Step4_PriorAuth({ priorAuth, onReset }: Props) {
               fontFamily: 'Instrument Sans, sans-serif',
               fontSize: '14px',
               fontWeight: activeTab === tab.id ? 600 : 400,
-              color: activeTab === tab.id ? '#FC5D36' : '#6b7280',
-              background: activeTab === tab.id ? '#FFFFFF' : 'transparent',
-              boxShadow: activeTab === tab.id ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-              border: activeTab === tab.id ? '1px solid rgba(252,93,54,0.15)' : '1px solid transparent',
+              color: activeTab === tab.id ? '#FC5D36' : 'rgba(255,255,255,0.5)',
+              background: activeTab === tab.id ? 'rgba(255,255,255,0.1)' : 'transparent',
+              boxShadow: activeTab === tab.id ? '0 1px 3px rgba(0,0,0,0.3)' : 'none',
+              border: activeTab === tab.id ? '1px solid rgba(252,93,54,0.25)' : '1px solid transparent',
             }}
           >
             {tab.icon}
@@ -260,66 +261,66 @@ export function Step4_PriorAuth({ priorAuth, onReset }: Props) {
               <div>
                 <span
                   className="block"
-                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                 >
                   Submission ID
                 </span>
-                <span style={{ fontFamily: 'Inter, monospace', fontSize: '12px', color: '#363636' }}>
+                <span style={{ fontFamily: 'Inter, monospace', fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>
                   {priorAuth.submission_id}
                 </span>
               </div>
               <div>
                 <span
                   className="block"
-                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                 >
                   Timestamp
                 </span>
-                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#363636' }}>
+                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.8)' }}>
                   {new Date(priorAuth.timestamp).toLocaleString()}
                 </span>
               </div>
               <div>
                 <span
                   className="block"
-                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                 >
                   Patient
                 </span>
-                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#060B13' }}>
+                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#ffffff' }}>
                   {priorAuth.patient.name || priorAuth.patient.id}
                 </span>
               </div>
               <div>
                 <span
                   className="block"
-                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                 >
                   CPT Code
                 </span>
-                <span style={{ fontFamily: 'Inter, monospace', fontSize: '14px', color: '#060B13' }}>
+                <span style={{ fontFamily: 'Inter, monospace', fontSize: '14px', color: '#ffffff' }}>
                   {priorAuth.requested_service.cpt_code}
                 </span>
               </div>
               <div>
                 <span
                   className="block"
-                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                 >
                   Procedure
                 </span>
-                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#363636' }}>
+                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.8)' }}>
                   {priorAuth.requested_service.description}
                 </span>
               </div>
               <div>
                 <span
                   className="block"
-                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                 >
                   ICD-10 Codes
                 </span>
-                <span style={{ fontFamily: 'Inter, monospace', fontSize: '13px', color: '#363636' }}>
+                <span style={{ fontFamily: 'Inter, monospace', fontSize: '13px', color: 'rgba(255,255,255,0.8)' }}>
                   {priorAuth.requested_service.icd10_codes.join(', ')}
                 </span>
               </div>
@@ -329,7 +330,7 @@ export function Step4_PriorAuth({ priorAuth, onReset }: Props) {
               <div className="mt-4">
                 <span
                   className="block mb-2"
-                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                 >
                   Matched Criteria
                 </span>
@@ -350,11 +351,11 @@ export function Step4_PriorAuth({ priorAuth, onReset }: Props) {
             <div className="mt-4">
               <span
                 className="block mb-2"
-                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em' }}
               >
                 Clinical Justification
               </span>
-              <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: '#363636', lineHeight: 1.6 }}>
+              <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.8)', lineHeight: 1.6 }}>
                 {priorAuth.clinical_justification}
               </p>
             </div>
