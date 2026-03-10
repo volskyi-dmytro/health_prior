@@ -326,7 +326,7 @@ async def fetch_fhir_patient(
         completion_tokens=None,
         latency_ms=None,
         mcp_tools_called=["fetch_patient_record", request.fhir_server_url],
-        submission_id=request.session_id,
+        session_id=request.session_id,
     )
 
     return FHIRFetchResponse(
