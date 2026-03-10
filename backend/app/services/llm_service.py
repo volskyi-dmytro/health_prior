@@ -116,7 +116,7 @@ class LLMService:
                         f"{OPENROUTER_BASE}/chat/completions",
                         headers={
                             "Authorization": f"Bearer {self.api_key}",
-                            "HTTP-Referer": "https://healthprior.volskyi-dmytro.com",
+                            "HTTP-Referer": "https://healthprior.app",
                             "X-Title": "HealthPrior",
                         },
                         json={

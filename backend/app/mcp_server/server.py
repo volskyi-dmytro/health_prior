@@ -410,7 +410,8 @@ async def _oauth_protected_resource(request: Request):
     connecting. Returning an empty authorization_servers list signals that
     this MCP server requires no authentication.
     """
-    base = "https://healthprior.volskyi-dmytro.com"
+    from app.core.config import get_settings as _get_settings
+    base = _get_settings().PUBLIC_URL.rstrip("/")
     return JSONResponse({
         "resource": f"{base}/mcp/mcp/",
         "authorization_servers": [],

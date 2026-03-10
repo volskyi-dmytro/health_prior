@@ -169,7 +169,7 @@ export function AuthGate({ children }: Props) {
               className="text-center mt-5"
               style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}
             >
-              Latitude Health Assessment — Dmytro Volskyi
+              HealthPrior
             </p>
           </motion.div>
         </div>
@@ -181,7 +181,7 @@ export function AuthGate({ children }: Props) {
         >
           <div className="max-w-5xl mx-auto text-center">
             <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.25)' }}>
-              HealthPrior v1.0 — Latitude Health Assessment
+              HealthPrior
             </span>
           </div>
         </footer>

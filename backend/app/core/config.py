@@ -10,7 +10,8 @@ class Settings(BaseSettings):
     DEFAULT_MODEL: str = "anthropic/claude-3.5-sonnet"
     DATABASE_URL: str = "postgresql+asyncpg://healthprior:healthprior_dev@postgres:5432/healthprior"
     APP_ENV: str = "development"
-    CORS_ORIGINS: str = "https://healthprior.volskyi-dmytro.com,http://localhost:3000,http://localhost:3100"
+    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:3100"
+    PUBLIC_URL: str = "https://healthprior.app"
     MCP_SERVER_URL: str = "http://mcp-server:8001"
     PAYER_AGENT_URL: str = "http://payer-agent:8200"
     TESTING: bool = False
@@ -26,3 +27,6 @@ class Settings(BaseSettings):
         return [o.strip() for o in self.CORS_ORIGINS.split(",")]
 
 settings = Settings()
+
+def get_settings() -> Settings:
+    return settings

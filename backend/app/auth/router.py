@@ -9,7 +9,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 GITHUB_AUTHORIZE_URL = "https://github.com/login/oauth/authorize"
 GITHUB_TOKEN_URL = "https://github.com/login/oauth/access_token"
 GITHUB_USER_URL = "https://api.github.com/user"
-FRONTEND_URL = "https://healthprior.volskyi-dmytro.com"
+FRONTEND_URL = settings.PUBLIC_URL
 
 
 @router.get("/github")
@@ -94,6 +94,6 @@ async def me(request: Request):
 
 @router.get("/logout")
 async def logout():
-    response = RedirectResponse("https://healthprior.volskyi-dmytro.com")
+    response = RedirectResponse(settings.PUBLIC_URL)
     clear_session(response)
     return response

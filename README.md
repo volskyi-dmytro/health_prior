@@ -29,7 +29,7 @@ HealthPrior demonstrates three interoperability protocols working together:
 
 ## Live Demo
 
-https://healthprior.volskyi-dmytro.com
+https://your-domain.com
 
 ## Local Setup
 

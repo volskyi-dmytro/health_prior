@@ -453,7 +453,7 @@ export default function App() {
                 <span style={{ color: '#fff', fontSize: '11px', fontWeight: 600 }}>HP</span>
               </div>
               <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.35)' }}>
-                HealthPrior — Latitude Health Assessment
+                HealthPrior
               </span>
             </div>
             <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.35)' }}>
