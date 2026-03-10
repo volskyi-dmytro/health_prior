@@ -148,6 +148,7 @@ jobs:
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
             # Pull new images
+            # Note: healthprior-mcp reuses the backend image — pulling backend covers it
             docker pull stpunk47/healthprior-backend:$IMAGE_TAG
             docker pull stpunk47/healthprior-frontend:$IMAGE_TAG
             docker pull stpunk47/healthprior-payer-agent:$IMAGE_TAG
@@ -155,38 +156,31 @@ jobs:
             # Update .env IMAGE_TAG
             sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG=$IMAGE_TAG/" .env || echo "IMAGE_TAG=$IMAGE_TAG" >> .env
 
-            # Restart services
+            # Start all services (backend, mcp-server, frontend, payer-agent, postgres)
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
             # Reload nginx
             sudo nginx -t && sudo nginx -s reload
 
-            # Health checks
+            # Health checks — fail the deploy if any service doesn't come up
             echo "Running health checks..."
-            for i in $(seq 1 30); do
-              if curl -sf http://localhost:8100/health > /dev/null 2>&1; then
-                echo "Backend healthy"
-                break
-              fi
-              echo "Waiting for backend... attempt $i"
-              sleep 3
-            done
 
-            for i in $(seq 1 20); do
-              if curl -sf http://localhost:8001/health > /dev/null 2>&1; then
-                echo "MCP server healthy"
-                break
-              fi
-              sleep 3
-            done
+            wait_healthy() {
+              local name=$1 url=$2 max=$3
+              for i in $(seq 1 $max); do
+                if curl -sf "$url" > /dev/null 2>&1; then
+                  echo "$name healthy"
+                  return 0
+                fi
+                echo "Waiting for $name... attempt $i/$max"
+                sleep 3
+              done
+              echo "ERROR: $name failed to become healthy" >&2
+              exit 1
+            }
 
-            for i in $(seq 1 20); do
-              if curl -sf http://localhost:8200/.well-known/agent.json > /dev/null 2>&1; then
-                echo "Payer agent healthy"
-                break
-              fi
-              echo "Waiting for payer agent... attempt $i"
-              sleep 3
-            done
+            wait_healthy "backend"     http://localhost:8100/health                  30
+            wait_healthy "mcp-server"  http://localhost:8001/health                  20
+            wait_healthy "payer-agent" http://localhost:8200/.well-known/agent.json  20
 
             echo "Deployment complete"
