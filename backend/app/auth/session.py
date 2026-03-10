@@ -54,9 +54,10 @@ async def require_ai_access(request: Request) -> dict:
     user = get_session(request)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
-    if user.get("is_admin"):
-        return user
     login = user.get("github_login", "")
+    is_admin = bool(settings.ADMIN_GITHUB_LOGIN and login.lower() == settings.ADMIN_GITHUB_LOGIN.lower())
+    if is_admin:
+        return user
     async with AsyncSessionLocal() as db:
         result = await db.execute(
             text("SELECT 1 FROM allowed_users WHERE github_login = :login"),

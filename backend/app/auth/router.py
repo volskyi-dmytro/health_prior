@@ -81,7 +81,8 @@ async def me(request: Request, db: AsyncSession = Depends(get_db)):
     if not user:
         return JSONResponse({"authenticated": False}, status_code=401)
     login = user.get("github_login", "")
-    is_admin = user.get("is_admin", False)
+    # Re-evaluate admin from current config, not stale session value
+    is_admin = bool(settings.ADMIN_GITHUB_LOGIN and login.lower() == settings.ADMIN_GITHUB_LOGIN.lower())
     ai_access = is_admin
     if not ai_access:
         result = await db.execute(
