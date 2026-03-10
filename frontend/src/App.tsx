@@ -286,14 +286,14 @@ function WizardApp() {
           style={{ height: '200px' }}
         >
           <img
-            src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1400&q=80&auto=format&fit=crop"
-            alt="MRI Scanner"
+            src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1400&q=80&auto=format&fit=crop"
+            alt="Healthcare professional reviewing clinical data"
             className="w-full h-full object-cover"
-            style={{ objectPosition: 'center 40%' }}
+            style={{ objectPosition: 'center 30%' }}
           />
           <div
             className="absolute inset-0 flex flex-col justify-center px-10"
-            style={{ background: 'linear-gradient(to right, rgba(6,11,19,0.88) 45%, rgba(6,11,19,0.25))' }}
+            style={{ background: 'linear-gradient(105deg, rgba(6,11,19,0.92) 40%, rgba(252,93,54,0.18) 75%, rgba(6,11,19,0.15))' }}
           >
             <div
               className="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-full w-fit"

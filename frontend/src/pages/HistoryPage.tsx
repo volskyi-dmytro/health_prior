@@ -205,14 +205,14 @@ export function HistoryPage() {
       {/* Hero banner */}
       <div className="relative w-full rounded-2xl overflow-hidden mb-8" style={{ height: '160px' }}>
         <img
-          src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=1400&q=80&auto=format&fit=crop"
-          alt="Medical records"
+          src="https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=1400&q=80&auto=format&fit=crop"
+          alt="Healthcare professional reviewing patient records"
           className="w-full h-full object-cover"
-          style={{ objectPosition: 'center 60%' }}
+          style={{ objectPosition: 'center 25%' }}
         />
         <div
           className="absolute inset-0 flex items-center px-8"
-          style={{ background: 'linear-gradient(to right, rgba(6,11,19,0.85) 50%, rgba(6,11,19,0.2))' }}
+          style={{ background: 'linear-gradient(105deg, rgba(6,11,19,0.90) 45%, rgba(253,179,82,0.15) 75%, rgba(6,11,19,0.15))' }}
         >
           <div>
             <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '11px', fontWeight: 600, color: '#FC5D36', letterSpacing: '0.08em', marginBottom: '6px' }}>

@@ -88,9 +88,9 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
         style={{ height: '100px', border: '1px solid #e5e7eb' }}
       >
         <img
-          src="https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800&q=80&auto=format&fit=crop"
-          alt="Lumbar spine MRI"
-          style={{ width: '160px', height: '100%', objectFit: 'cover', objectPosition: 'center', flexShrink: 0 }}
+          src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=800&q=80&auto=format&fit=crop"
+          alt="Clinical environment"
+          style={{ width: '160px', height: '100%', objectFit: 'cover', objectPosition: 'center 20%', flexShrink: 0 }}
         />
         <div
           className="flex items-center gap-8 px-6"
