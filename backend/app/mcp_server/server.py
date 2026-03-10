@@ -403,10 +403,26 @@ async def _mcp_discovery(request: Request):
     })
 
 
-# Inject /health and /.well-known/mcp.json as the first routes so they take
-# priority over the catch-all /mcp route registered by FastMCP.
+async def _oauth_protected_resource(request: Request):
+    """RFC 9728 OAuth 2.0 Protected Resource Metadata.
+
+    Claude.ai probes this endpoint to discover auth requirements before
+    connecting. Returning an empty authorization_servers list signals that
+    this MCP server requires no authentication.
+    """
+    base = "https://healthprior.volskyi-dmytro.com"
+    return JSONResponse({
+        "resource": f"{base}/mcp/mcp/",
+        "authorization_servers": [],
+        "scopes_supported": [],
+        "bearer_methods_supported": [],
+    })
+
+
+# Inject extra routes before FastMCP's catch-all /mcp route.
 app.routes.insert(0, Route("/health", _health, methods=["GET", "HEAD"]))
 app.routes.insert(1, Route("/.well-known/mcp.json", _mcp_discovery, methods=["GET"]))
+app.routes.insert(2, Route("/.well-known/oauth-protected-resource", _oauth_protected_resource, methods=["GET"]))
 
 
 if __name__ == "__main__":
