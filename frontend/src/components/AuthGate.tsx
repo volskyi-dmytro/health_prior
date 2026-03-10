@@ -20,7 +20,7 @@ export function AuthGate({ children }: Props) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#FAF9F5' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0f1a' }}>
         <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#FC5D36' }} />
       </div>
     );
@@ -31,19 +31,46 @@ export function AuthGate({ children }: Props) {
     const error = params.get('error');
 
     return (
-      <div className="min-h-screen flex flex-col" style={{ background: '#FAF9F5' }}>
+      <div
+        className="min-h-screen flex flex-col relative overflow-hidden"
+        style={{ background: '#0a0f1a' }}
+      >
+        {/* Full-bleed background image */}
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1920&q=85&auto=format&fit=crop"
+            alt=""
+            aria-hidden="true"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: 'center 35%' }}
+          />
+          {/* Multi-layer overlay: dark base + brand-tinted vignette */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(160deg, rgba(6,11,19,0.82) 0%, rgba(6,11,19,0.65) 50%, rgba(252,93,54,0.12) 100%)',
+            }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'radial-gradient(ellipse at 70% 50%, rgba(253,179,82,0.06) 0%, transparent 65%)',
+            }}
+          />
+        </div>
+
         {/* Announcement bar */}
         <div
-          className="w-full text-center py-2 px-4 text-sm"
-          style={{ background: '#F9BA54', fontFamily: 'Instrument Sans, sans-serif', color: '#000' }}
+          className="relative z-10 w-full text-center py-2 px-4 text-sm"
+          style={{ background: 'rgba(249,186,84,0.15)', borderBottom: '1px solid rgba(249,186,84,0.25)', backdropFilter: 'blur(8px)', fontFamily: 'Instrument Sans, sans-serif', color: 'rgba(255,255,255,0.75)' }}
         >
           Prior authorization automation powered by clinical AI — Molina MCR-621 · CPT 72148 · FHIR R4
         </div>
 
         {/* Nav */}
         <header
-          className="border-b px-6 flex items-center"
-          style={{ background: '#FFFFFF', borderColor: '#e5e7eb', height: '72px' }}
+          className="relative z-10 px-6 flex items-center"
+          style={{ backdropFilter: 'blur(12px)', background: 'rgba(6,11,19,0.4)', borderBottom: '1px solid rgba(255,255,255,0.08)', height: '72px' }}
         >
           <div className="max-w-5xl mx-auto w-full flex items-center gap-3">
             <div
@@ -52,54 +79,60 @@ export function AuthGate({ children }: Props) {
             >
               <span style={{ color: '#fff', fontFamily: 'General Sans, sans-serif', fontWeight: 600, fontSize: '14px' }}>HP</span>
             </div>
-            <span style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '18px', color: '#000' }}>
+            <span style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '18px', color: '#fff' }}>
               HealthPrior
             </span>
-            <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#FC5D36' }}>
+            <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#FDB352' }}>
               Clinical AI
             </span>
           </div>
         </header>
 
         {/* Login card */}
-        <div className="flex-1 flex items-center justify-center px-4">
+        <div className="relative z-10 flex-1 flex items-center justify-center px-4">
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
             className="w-full max-w-sm"
           >
-            <div className="text-center mb-8">
+            {/* Brand mark above card */}
+            <div className="text-center mb-6">
               <div
-                className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
-                style={{ background: 'rgba(252,93,54,0.08)', border: '1px solid rgba(252,93,54,0.25)' }}
+                className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4"
+                style={{ background: 'linear-gradient(135deg, #FDB352 0%, #FC5D36 100%)', boxShadow: '0 8px 32px rgba(252,93,54,0.35)' }}
               >
-                <Lock className="w-8 h-8" style={{ color: '#FC5D36' }} />
+                <Lock className="w-6 h-6" style={{ color: '#fff' }} />
               </div>
               <h1
-                style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '32px', color: '#000', marginBottom: '6px' }}
+                style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 600, fontSize: '30px', color: '#fff', marginBottom: '4px' }}
               >
                 HealthPrior
               </h1>
-              <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: '#6b7280' }}>
+              <p style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>
                 Clinical AI Prior Authorization
               </p>
             </div>
 
-            {/* Card */}
+            {/* Frosted glass card */}
             <div
               className="rounded-2xl p-8"
-              style={{ background: '#FFFFFF', border: '1px solid #e5e7eb' }}
+              style={{
+                background: 'rgba(255,255,255,0.07)',
+                border: '1px solid rgba(255,255,255,0.13)',
+                backdropFilter: 'blur(20px)',
+                boxShadow: '0 24px 64px rgba(0,0,0,0.4)',
+              }}
             >
               <h2
                 className="text-center mb-2"
-                style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '20px', color: '#000' }}
+                style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '20px', color: '#fff' }}
               >
                 Access Required
               </h2>
               <p
                 className="text-center mb-6 leading-relaxed"
-                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: '#6b7280' }}
+                style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: 'rgba(255,255,255,0.55)' }}
               >
                 This application is private. Sign in with your GitHub account to continue.
               </p>
@@ -107,7 +140,7 @@ export function AuthGate({ children }: Props) {
               {error === 'access_denied' && (
                 <div
                   className="mb-4 p-3 rounded-xl text-center text-xs"
-                  style={{ background: 'rgba(252,93,54,0.08)', border: '1px solid rgba(252,93,54,0.3)', color: '#FC5D36', fontFamily: 'Instrument Sans, sans-serif' }}
+                  style={{ background: 'rgba(252,93,54,0.15)', border: '1px solid rgba(252,93,54,0.4)', color: '#FC5D36', fontFamily: 'Instrument Sans, sans-serif' }}
                 >
                   Your GitHub account is not authorized to access this application.
                 </div>
@@ -117,14 +150,15 @@ export function AuthGate({ children }: Props) {
                 href={loginUrl()}
                 className="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-[100px] transition-all"
                 style={{
-                  background: '#000',
-                  color: '#fff',
+                  background: '#fff',
+                  color: '#000',
                   fontFamily: 'Inter, sans-serif',
                   fontSize: '14px',
-                  fontWeight: 500,
+                  fontWeight: 600,
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.filter = 'brightness(0.85)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.filter = 'none'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = '#f0f0f0'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = '#fff'; }}
               >
                 <Github className="w-5 h-5" />
                 <span>Continue with GitHub</span>
@@ -132,8 +166,8 @@ export function AuthGate({ children }: Props) {
             </div>
 
             <p
-              className="text-center mt-4"
-              style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#9ca3af' }}
+              className="text-center mt-5"
+              style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}
             >
               Latitude Health Assessment — Dmytro Volskyi
             </p>
@@ -141,9 +175,12 @@ export function AuthGate({ children }: Props) {
         </div>
 
         {/* Footer */}
-        <footer className="border-t px-6 py-4" style={{ borderColor: '#e5e7eb', background: '#FFFFFF' }}>
+        <footer
+          className="relative z-10 px-6 py-4"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(12px)', background: 'rgba(6,11,19,0.4)' }}
+        >
           <div className="max-w-5xl mx-auto text-center">
-            <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#9ca3af' }}>
+            <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.25)' }}>
               HealthPrior v1.0 — Latitude Health Assessment
             </span>
           </div>
