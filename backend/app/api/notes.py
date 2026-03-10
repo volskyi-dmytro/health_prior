@@ -303,19 +303,34 @@ async def fetch_fhir_patient(
     medications = _extract_bundle_entries(medications_data) if medications_data else []
     observations = _extract_bundle_entries(observations_data) if observations_data else []
 
+    # Flatten entries without the {"resource": ...} wrapper so the frontend
+    # can access resourceType directly (same shape as LLM-structured bundles).
+    flat_entries = [patient_data, *conditions, *medications, *observations]
+
+    # Build patient_demographics from the Patient resource so Step 2 renders
+    # the patient card correctly.
+    names = patient_data.get("name", [])
+    name_obj = names[0] if names else {}
+    given = " ".join(name_obj.get("given", []))
+    family = name_obj.get("family", "")
+    patient_name_str = f"{given} {family}".strip() or name_obj.get("text", "Unknown")
+
+    patient_demographics = {
+        "name": patient_name_str,
+        "dob": patient_data.get("birthDate"),
+        "gender": patient_data.get("gender"),
+        "id": patient_data.get("id"),
+    }
+
     fhir_bundle = {
         "resourceType": "Bundle",
         "type": "searchset",
-        "entry": [
-            {"resource": patient_data},
-            *[{"resource": r} for r in conditions],
-            *[{"resource": r} for r in medications],
-            *[{"resource": r} for r in observations],
-        ],
+        "patient_demographics": patient_demographics,
+        "entry": flat_entries,
     }
 
-    patient_name = _extract_patient_name(fhir_bundle)
-    resource_counts = _count_resources(fhir_bundle)
+    patient_name = patient_name_str
+    resource_counts = _count_resources({"entry": [{"resource": e} for e in flat_entries]})
 
     # Audit log — non-fatal
     await log_llm_call(
