@@ -361,6 +361,10 @@ export function AuthGate({ children }: Props) {
 
   if (loading) return <LoadingScreen />;
 
+  // Public routes — accessible without authentication
+  if (window.location.pathname === '/how-it-works') return <>{children}</>;
+
+
   // ── Not logged in ──
   if (!user?.authenticated) {
     const error = new URLSearchParams(window.location.search).get('error');
