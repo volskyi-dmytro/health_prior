@@ -11,12 +11,12 @@ const steps = [
 
 export function WizardProgress({ current }: { current: WizardStep }) {
   return (
-    <div className="flex items-center justify-center mb-10">
+    <div className="flex items-center justify-center mb-6 sm:mb-10">
       {steps.map((step, i) => (
         <div key={step.id} className="flex items-center">
           <div className="flex flex-col items-center">
             <motion.div
-              className="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all"
               style={
                 current > step.id
                   ? { background: '#FC5D36', borderColor: '#FC5D36', color: '#fff' }
@@ -34,7 +34,7 @@ export function WizardProgress({ current }: { current: WizardStep }) {
               )}
             </motion.div>
             <span
-              className="mt-2 text-xs whitespace-nowrap"
+              className="mt-2 text-xs whitespace-nowrap hidden sm:block"
               style={{
                 fontFamily: 'Instrument Sans, sans-serif',
                 fontWeight: 500,
@@ -46,7 +46,7 @@ export function WizardProgress({ current }: { current: WizardStep }) {
           </div>
           {i < steps.length - 1 && (
             <div
-              className="h-0.5 w-16 mx-2 mb-5 transition-colors"
+              className="h-0.5 w-8 sm:w-16 mx-1 sm:mx-2 mb-5 transition-colors"
               style={{ background: current > step.id ? '#FC5D36' : 'rgba(255,255,255,0.12)' }}
             />
           )}

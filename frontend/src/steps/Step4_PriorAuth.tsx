@@ -207,12 +207,12 @@ export function Step4_PriorAuth({ priorAuth, onReset }: Props) {
       </div>
 
       {/* Tab bar */}
-      <div className="flex items-center gap-1 mb-6 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.06)', width: 'fit-content', margin: '0 auto 24px' }}>
+      <div className="flex items-center gap-1 mb-6 p-1 rounded-xl w-full sm:w-auto" style={{ background: 'rgba(255,255,255,0.06)', margin: '0 auto 24px' }}>
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className="flex items-center gap-2 px-5 py-2 rounded-lg transition-all"
+            className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2 rounded-lg transition-all flex-1 sm:flex-none"
             style={{
               fontFamily: 'Instrument Sans, sans-serif',
               fontSize: '14px',
@@ -378,12 +378,12 @@ export function Step4_PriorAuth({ priorAuth, onReset }: Props) {
       )}
 
       {/* Actions */}
-      <div className="flex gap-3 justify-center mt-6">
+      <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
         <motion.button
           onClick={downloadJson}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="btn-outline flex items-center gap-2"
+          className="btn-outline flex items-center justify-center gap-2 w-full sm:w-auto"
         >
           <Download className="w-4 h-4" />
           Download JSON
@@ -393,7 +393,7 @@ export function Step4_PriorAuth({ priorAuth, onReset }: Props) {
           onClick={downloadPdf}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="btn-amber flex items-center gap-2"
+          className="btn-amber flex items-center justify-center gap-2 w-full sm:w-auto"
         >
           <FileText className="w-4 h-4" />
           Download PDF Letter
@@ -403,7 +403,7 @@ export function Step4_PriorAuth({ priorAuth, onReset }: Props) {
           onClick={onReset}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="btn-primary flex items-center gap-2"
+          className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
         >
           <RotateCcw className="w-4 h-4" />
           New Analysis

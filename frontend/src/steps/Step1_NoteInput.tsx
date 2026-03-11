@@ -84,29 +84,32 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
 
       {/* Contextual image strip */}
       <div
-        className="relative w-full rounded-xl overflow-hidden mb-6 flex"
-        style={{ height: '100px', border: '1px solid rgba(255,255,255,0.1)' }}
+        className="relative w-full rounded-xl overflow-hidden mb-6"
+        style={{ border: '1px solid rgba(255,255,255,0.1)' }}
       >
-        <img
-          src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=800&q=80&auto=format&fit=crop"
-          alt="Clinical environment"
-          style={{ width: '160px', height: '100%', objectFit: 'cover', objectPosition: 'center 20%', flexShrink: 0 }}
-        />
-        <div
-          className="flex items-center gap-8 px-6"
-          style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(16px)', flex: 1 }}
-        >
-          {[
-            { label: 'Policy', value: 'Molina MCR-621' },
-            { label: 'Procedure', value: 'Lumbar Spine MRI' },
-            { label: 'CPT Code', value: '72148' },
-            { label: 'Protocol', value: 'FHIR R4 · A2A' },
-          ].map(({ label, value }) => (
-            <div key={label}>
-              <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '4px' }}>{label}</div>
-              <div style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '13px', color: '#ffffff' }}>{value}</div>
-            </div>
-          ))}
+        <div className="flex" style={{ minHeight: '80px' }}>
+          <img
+            src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=800&q=80&auto=format&fit=crop"
+            alt="Clinical environment"
+            className="hidden sm:block"
+            style={{ width: '140px', objectFit: 'cover', objectPosition: 'center 20%', flexShrink: 0 }}
+          />
+          <div
+            className="grid grid-cols-2 sm:flex sm:items-center sm:gap-8 gap-x-4 gap-y-2 px-4 sm:px-6 py-3 sm:py-0 w-full"
+            style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(16px)' }}
+          >
+            {[
+              { label: 'Policy', value: 'Molina MCR-621' },
+              { label: 'Procedure', value: 'Lumbar Spine MRI' },
+              { label: 'CPT Code', value: '72148' },
+              { label: 'Protocol', value: 'FHIR R4 · A2A' },
+            ].map(({ label, value }) => (
+              <div key={label}>
+                <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '2px' }}>{label}</div>
+                <div style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '12px', color: '#ffffff' }}>{value}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -238,7 +241,7 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Paste clinical note here (H&P, discharge summary, progress note)..."
-            className="w-full h-64 p-4 resize-none focus:outline-none transition-all rounded-xl"
+            className="w-full h-48 sm:h-64 p-4 resize-none focus:outline-none transition-all rounded-xl"
             style={{
               fontFamily: 'Inter, monospace',
               fontSize: '13px',
@@ -276,7 +279,7 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
           </div>
 
           {/* Model picker + submit */}
-          <div className="flex items-center gap-3 mt-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-2">
             <div className="flex items-center gap-2 flex-1">
               <Cpu className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.4)' }} />
               <select
@@ -323,7 +326,7 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
               disabled={!note.trim() || loading}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="btn-primary flex items-center gap-2"
+              className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
             >
               {loading ? (
                 <span>Analyzing...</span>
@@ -400,7 +403,7 @@ export function Step1_NoteInput({ onSubmit, onFetchFromFHIR, loading }: Props) {
                 disabled={!fhirServerUrl.trim() || !fhirPatientId.trim() || loading}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="btn-primary flex items-center gap-2"
+                className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 {loading ? (
                   <span>Fetching...</span>

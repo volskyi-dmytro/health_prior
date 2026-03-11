@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { History, BookOpen, ShieldCheck } from 'lucide-react';
+import { History, BookOpen, ShieldCheck, Menu, X } from 'lucide-react';
 import { WizardProgress } from './components/WizardProgress';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { Step1_NoteInput } from './steps/Step1_NoteInput';
@@ -281,7 +281,7 @@ function WizardApp() {
     : null;
 
   return (
-    <main className="max-w-5xl mx-auto px-6 py-10">
+    <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
       {step === 1 && (
         <div
           className="relative w-full rounded-2xl overflow-hidden mb-8"
@@ -294,7 +294,7 @@ function WizardApp() {
             style={{ objectPosition: 'center 30%' }}
           />
           <div
-            className="absolute inset-0 flex flex-col justify-center px-10"
+            className="absolute inset-0 flex flex-col justify-center px-5 sm:px-10"
             style={{ background: 'linear-gradient(105deg, rgba(6,11,19,0.92) 40%, rgba(252,93,54,0.18) 75%, rgba(6,11,19,0.15))' }}
           >
             <div
@@ -392,6 +392,7 @@ function WizardApp() {
 export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   useEffect(() => {
     getMe().then(u => setIsAdmin(!!u.is_admin));
   }, []);
@@ -404,33 +405,35 @@ export default function App() {
           className="w-full text-center py-2 px-4 text-sm"
           style={{ background: 'rgba(249,186,84,0.12)', borderBottom: '1px solid rgba(249,186,84,0.2)', fontFamily: 'Instrument Sans, sans-serif', color: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
         >
-          Prior authorization automation powered by clinical AI — Molina MCR-621 · CPT 72148 · FHIR R4
+          <span className="hidden sm:inline">Prior authorization automation powered by clinical AI — Molina MCR-621 · CPT 72148 · FHIR R4</span>
+          <span className="sm:hidden">Clinical AI · Molina MCR-621 · FHIR R4</span>
         </div>
 
         {/* Navigation */}
         <header
-          className="sticky top-0 z-50 border-b px-6"
-          style={{ background: 'rgba(6,11,19,0.5)', borderColor: 'rgba(255,255,255,0.08)', height: '72px', display: 'flex', alignItems: 'center', backdropFilter: 'blur(16px)' }}
+          className="sticky top-0 z-50 border-b px-4 sm:px-6"
+          style={{ background: 'rgba(6,11,19,0.5)', borderColor: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(16px)' }}
         >
-          <div className="max-w-5xl mx-auto w-full flex items-center justify-between">
-            <Link to="/" onClick={() => setResetKey(k => k + 1)} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="max-w-5xl mx-auto w-full flex items-center justify-between" style={{ height: '64px' }}>
+            <Link to="/" onClick={() => { setResetKey(k => k + 1); setMobileMenuOpen(false); }} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center"
+                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                 style={{ background: 'linear-gradient(110deg, #FDB352 0%, #FC5D36 100%)' }}
               >
                 <span style={{ color: '#fff', fontFamily: 'General Sans, sans-serif', fontWeight: 600, fontSize: '14px' }}>HP</span>
               </div>
               <div>
-                <span style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '18px', color: '#ffffff' }}>
+                <span style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '17px', color: '#ffffff' }}>
                   HealthPrior
                 </span>
-                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#FC5D36', marginLeft: '8px' }}>
+                <span className="hidden sm:inline" style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#FC5D36', marginLeft: '8px' }}>
                   Clinical AI
                 </span>
               </div>
             </Link>
 
-            <div className="flex items-center gap-6">
+            {/* Desktop nav */}
+            <div className="hidden sm:flex items-center gap-6">
               <NavLink to="/how-it-works">
                 <span className="flex items-center gap-1.5">
                   <BookOpen className="w-4 h-4" />
@@ -456,7 +459,50 @@ export default function App() {
                 <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>MCP Connected</span>
               </div>
             </div>
+
+            {/* Mobile: MCP dot + hamburger */}
+            <div className="flex sm:hidden items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#FC5D36' }} />
+                <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>MCP</span>
+              </div>
+              <button
+                onClick={() => setMobileMenuOpen(o => !o)}
+                className="p-2 rounded-lg transition-colors"
+                style={{ color: 'rgba(255,255,255,0.7)', background: mobileMenuOpen ? 'rgba(255,255,255,0.08)' : 'transparent' }}
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
+
+          {/* Mobile dropdown menu */}
+          {mobileMenuOpen && (
+            <div
+              className="sm:hidden border-t pb-4 pt-3 flex flex-col gap-1"
+              style={{ borderColor: 'rgba(255,255,255,0.08)' }}
+            >
+              {[
+                { to: '/how-it-works', icon: <BookOpen className="w-4 h-4" />, label: 'How It Works' },
+                { to: '/history', icon: <History className="w-4 h-4" />, label: 'History' },
+                ...(isAdmin ? [{ to: '/admin', icon: <ShieldCheck className="w-4 h-4" />, label: 'Admin' }] : []),
+              ].map(({ to, icon, label }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors"
+                  style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '15px', color: 'rgba(255,255,255,0.75)', textDecoration: 'none', background: 'transparent' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                >
+                  {icon}
+                  {label}
+                </Link>
+              ))}
+            </div>
+          )}
         </header>
 
         {/* Routes */}
@@ -468,8 +514,8 @@ export default function App() {
         </Routes>
 
         {/* Footer */}
-        <footer className="border-t px-6 py-6 mt-10" style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(6,11,19,0.5)', backdropFilter: 'blur(16px)' }}>
-          <div className="max-w-5xl mx-auto flex items-center justify-between">
+        <footer className="border-t px-4 sm:px-6 py-6 mt-10" style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(6,11,19,0.5)', backdropFilter: 'blur(16px)' }}>
+          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
             <div className="flex items-center gap-3">
               <div
                 className="w-7 h-7 rounded-lg flex items-center justify-center"

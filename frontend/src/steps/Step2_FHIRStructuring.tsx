@@ -31,7 +31,7 @@ function BundleColumn({ fhirBundle, label }: { fhirBundle: FHIRBundle; label?: s
           </span>
         </div>
       )}
-      <div className="overflow-auto max-h-[560px] pr-1">
+      <div className="overflow-auto max-h-[60vh] sm:max-h-[560px] pr-1">
         {Object.keys(demo).length > 0 && (
           <motion.div
             initial={{ opacity: 0, x: 40 }}
@@ -137,7 +137,7 @@ export function Step2_FHIRStructuring({ fhirBundle, fhirBundleB, modelALabel, mo
               Raw Clinical Note
             </h3>
             <div
-              className="overflow-auto max-h-[500px] whitespace-pre-wrap leading-relaxed"
+              className="overflow-auto max-h-[40vh] sm:max-h-[500px] whitespace-pre-wrap leading-relaxed"
               style={{ fontFamily: 'Inter, monospace', fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}
             >
               {rawNote}

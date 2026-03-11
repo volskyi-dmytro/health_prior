@@ -10,11 +10,13 @@
     font-family: 'Instrument Sans', sans-serif;
     background-color: #0a0f1a;
     color: #ffffff;
+    overflow-x: hidden;
   }
 
   body {
     background-color: #0a0f1a;
     position: relative;
+    overflow-x: hidden;
   }
 
   body::before {
