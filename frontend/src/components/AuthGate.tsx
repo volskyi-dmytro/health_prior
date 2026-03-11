@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Github, Lock, Loader2, ShieldOff, Users, Trash2, Plus, CheckCircle2, XCircle } from 'lucide-react';
 import { getMe, loginUrl, logoutUrl, listAllowedUsers, grantAiAccess, revokeAiAccess, type AuthUser, type AllowedUser } from '../api/healthprior';
+import { HowItWorksPage } from '../pages/HowItWorksPage';
 
 interface Props {
   children: React.ReactNode;
@@ -371,8 +372,36 @@ export function AuthGate({ children }: Props) {
 
   if (loading) return <LoadingScreen />;
 
-  // Public routes — accessible without authentication
-  if (window.location.pathname === '/how-it-works') return <>{children}</>;
+  // Public routes — render standalone without the full App shell
+  if (window.location.pathname === '/how-it-works') {
+    return (
+      <div className="min-h-screen" style={{ background: '#0a0f1a' }}>
+        <header
+          className="sticky top-0 z-50 border-b px-6"
+          style={{ background: 'rgba(6,11,19,0.5)', borderColor: 'rgba(255,255,255,0.08)', height: '72px', display: 'flex', alignItems: 'center', backdropFilter: 'blur(16px)' }}
+        >
+          <div className="max-w-5xl mx-auto w-full flex items-center justify-between">
+            <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(110deg,#FDB352 0%,#FC5D36 100%)' }}>
+                <span style={{ color: '#fff', fontFamily: 'General Sans, sans-serif', fontWeight: 600, fontSize: '14px' }}>HP</span>
+              </div>
+              <span style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '18px', color: '#fff' }}>HealthPrior</span>
+              <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#FDB352' }}>Clinical AI</span>
+            </a>
+            <a
+              href={loginUrl()}
+              style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', transition: 'color 0.15s' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#FDB352'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.6)'; }}
+            >
+              Sign in
+            </a>
+          </div>
+        </header>
+        <HowItWorksPage />
+      </div>
+    );
+  }
 
 
   // ── Not logged in ──
