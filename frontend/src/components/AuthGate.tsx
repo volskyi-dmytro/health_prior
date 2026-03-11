@@ -38,19 +38,29 @@ function NavHeader() {
         height: '72px',
       }}
     >
-      <div className="max-w-5xl mx-auto w-full flex items-center gap-3">
-        <div
-          className="w-9 h-9 rounded-xl flex items-center justify-center"
-          style={{ background: 'linear-gradient(110deg,#FDB352 0%,#FC5D36 100%)', boxShadow: '0 4px 14px rgba(252,93,54,0.35)' }}
-        >
-          <span style={{ color: '#fff', fontFamily: 'General Sans, sans-serif', fontWeight: 600, fontSize: '14px' }}>HP</span>
+      <div className="max-w-5xl mx-auto w-full flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center"
+            style={{ background: 'linear-gradient(110deg,#FDB352 0%,#FC5D36 100%)', boxShadow: '0 4px 14px rgba(252,93,54,0.35)' }}
+          >
+            <span style={{ color: '#fff', fontFamily: 'General Sans, sans-serif', fontWeight: 600, fontSize: '14px' }}>HP</span>
+          </div>
+          <span style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '18px', color: '#fff' }}>
+            HealthPrior
+          </span>
+          <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#FDB352', opacity: 0.9 }}>
+            Clinical AI
+          </span>
         </div>
-        <span style={{ fontFamily: 'General Sans, sans-serif', fontWeight: 500, fontSize: '18px', color: '#fff' }}>
-          HealthPrior
-        </span>
-        <span style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '12px', color: '#FDB352', opacity: 0.9 }}>
-          Clinical AI
-        </span>
+        <a
+          href="/how-it-works"
+          style={{ fontFamily: 'Instrument Sans, sans-serif', fontSize: '14px', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', transition: 'color 0.15s' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#FDB352'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.6)'; }}
+        >
+          How It Works
+        </a>
       </div>
     </header>
   );
