@@ -16,6 +16,7 @@ class MCPClient:
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.post(
                     f"{self.base_url}/mcp/",
+                    headers={"Accept": "application/json, text/event-stream"},
                     json={
                         "jsonrpc": "2.0",
                         "method": "tools/call",

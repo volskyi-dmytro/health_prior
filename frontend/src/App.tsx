@@ -162,6 +162,24 @@ function WizardApp() {
       });
       setFhirBundle(result.fhir_bundle);
       setFhirFetchMeta({ source: 'fhir_server', fhirServerUrl, patientId, resourceCounts: result.resource_counts });
+      // Build a synthetic note so coverage evaluation and prior-auth generation
+      // have textual context — the FHIR path has no raw clinical note.
+      const demo = result.fhir_bundle.patient_demographics;
+      const conditions = result.fhir_bundle.entry
+        .filter((e) => e.resourceType === 'Condition')
+        .map((e) => {
+          const coding = (e.code as { coding?: Array<{ display?: string }> })?.coding;
+          return coding?.[0]?.display ?? 'unknown condition';
+        })
+        .join(', ');
+      const syntheticNote = [
+        `Patient: ${result.patient_name || demo?.name || patientId}`,
+        demo?.dob ? `DOB: ${demo.dob}` : '',
+        demo?.gender ? `Gender: ${demo.gender}` : '',
+        `Source: FHIR server (${fhirServerUrl}), Patient ID: ${patientId}`,
+        conditions ? `Active conditions: ${conditions}` : '',
+      ].filter(Boolean).join('\n');
+      setRawNote(syntheticNote);
       setStep(2);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to fetch patient record');
