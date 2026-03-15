@@ -41,19 +41,30 @@ export function FHIRCard({ resource, index }: Props) {
   };
   const Icon = config.icon;
 
+  // Helper: extract display string from a CodeableConcept (FHIR R4) or plain string
+  const codeableText = (field: unknown): string => {
+    if (!field) return '';
+    if (typeof field === 'string') return field;
+    if (typeof field === 'object') {
+      const f = field as { text?: string; coding?: Array<{ display?: string; code?: string }> };
+      return f.text || f.coding?.[0]?.display || f.coding?.[0]?.code || '';
+    }
+    return '';
+  };
+
   const title =
-    resource.code?.text ||
-    resource.medication?.text ||
+    codeableText(resource.code) ||
+    codeableText(resource.medication) ||
     resource.resourceType;
 
   const detail =
-    resource.valueString ||
-    resource.dosageInstruction?.[0]?.text ||
+    (typeof resource.valueString === 'string' ? resource.valueString : '') ||
+    (resource.dosageInstruction as Array<{ text?: string }> | undefined)?.[0]?.text ||
     resource.evidence?.[0]?.detail?.[0]?.display ||
-    resource.clinicalStatus ||
+    codeableText(resource.clinicalStatus) ||
     '';
 
-  const icdCode = resource.code?.coding?.[0]?.code;
+  const icdCode = (resource.code as { coding?: Array<{ code?: string }> } | undefined)?.coding?.[0]?.code;
 
   return (
     <motion.div
