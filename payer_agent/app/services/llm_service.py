@@ -1,10 +1,14 @@
 """OpenRouter LLM client — adapted from backend with no DB dependency."""
 import asyncio
 import json
+import logging
+import re
 import time
 from typing import Any
 
 import httpx
+
+logger = logging.getLogger(__name__)
 
 from app.core.config import settings
 
@@ -144,12 +148,26 @@ class LLMService:
         return result.content
 
     def parse_json(self, raw: str) -> dict[str, Any]:
+        original = raw
         raw = raw.strip()
+        # Strip markdown code fences
         if raw.startswith("```"):
             raw = raw.split("```")[1]
             if raw.startswith("json"):
                 raw = raw[4:]
         raw = raw.strip()
         if not raw:
+            logger.error("parse_json: empty content after stripping. Original: %r", original[:500])
             raise ValueError("LLM returned empty JSON content")
-        return json.loads(raw, strict=False)
+        try:
+            return json.loads(raw, strict=False)
+        except json.JSONDecodeError:
+            # LLM may have wrapped JSON in prose — extract the first {...} block
+            match = re.search(r'\{.*\}', raw, re.DOTALL)
+            if match:
+                try:
+                    return json.loads(match.group(), strict=False)
+                except json.JSONDecodeError:
+                    pass
+            logger.error("parse_json: could not parse LLM response as JSON. Raw: %r", raw[:1000])
+            raise
