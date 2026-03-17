@@ -56,9 +56,11 @@ You will receive:
 
 Using ALL available information (FHIR data + conversation answers), re-evaluate the coverage request.
 
+IMPORTANT: You have already asked clarifying questions. You MUST now return a final APPROVED or DENIED decision. Do NOT return NEEDS_MORE_INFO — a determination must be made with the information available.
+
 Return a JSON object:
 {
-  "decision": "APPROVED" | "DENIED" | "NEEDS_MORE_INFO",
+  "decision": "APPROVED" | "DENIED",
   "matched_criteria": ["list of criterion IDs that are met"],
   "unmet_criteria": ["list of criterion IDs checked but not met"],
   "justification": "A 2-3 paragraph clinical justification referencing specific findings from the note and conversation answers.",

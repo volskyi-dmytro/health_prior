@@ -92,12 +92,30 @@ async def _run_evaluation(
 
     try:
         task = await task_store.get(task_id)
-        history: list[Message] = task.history if task else []
+        all_history: list[Message] = task.history if task else []
+
+        # Filter to only Q&A turns — exclude the initial DataPart message that
+        # carries the FHIR bundle. That message is not a clarifying exchange and
+        # its presence made `if not history:` always False, bypassing the initial
+        # COVERAGE_EVALUATION_SYSTEM prompt entirely.
+        qa_history = [
+            m for m in all_history
+            if not (m.role == "user" and all(isinstance(p, DataPart) for p in m.parts))
+        ]
+
+        # Cap clarification turns to avoid an infinite NEEDS_MORE_INFO loop.
+        MAX_QA_TURNS = 2
+        agent_turns = sum(1 for m in qa_history if m.role == "agent")
+        if agent_turns >= MAX_QA_TURNS:
+            # Force a final decision — use the re-eval path which must decide.
+            qa_history_for_eval = qa_history
+        else:
+            qa_history_for_eval = qa_history
 
         result = await evaluation_service.evaluate(
             fhir_bundle=fhir_bundle,
             policy_id=policy_id,
-            history=history,
+            history=qa_history_for_eval,
             llm_service=llm_service,
         )
 
