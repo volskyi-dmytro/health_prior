@@ -57,14 +57,17 @@ async def evaluate(
     """
     policy = _get_policy(policy_id)
 
-    # Short-circuit if the bundle has no clinical data to evaluate
+    # Short-circuit if the bundle has no clinical data to evaluate.
+    # Skip this guard when Q&A history exists — the user may have provided
+    # clinical information as free text in a prior conversation turn.
+    has_qa_history = any(m.role == "agent" for m in history)
     clinical_types = {"Condition", "MedicationRequest", "Observation", "Procedure", "DiagnosticReport"}
     entries = fhir_bundle.get("entry", [])
     has_clinical_data = any(
         (e.get("resourceType") or e.get("resource", {}).get("resourceType")) in clinical_types
         for e in entries
     )
-    if not has_clinical_data:
+    if not has_clinical_data and not has_qa_history:
         return {
             "decision": "NEEDS_MORE_INFO",
             "question": "The patient record contains no clinical data (conditions, medications, or observations). Please provide the relevant clinical history, diagnosis, or supporting documentation for this prior authorization request.",
