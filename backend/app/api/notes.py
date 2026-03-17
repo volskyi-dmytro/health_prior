@@ -289,8 +289,8 @@ async def fetch_fhir_patient(
         async with httpx.AsyncClient(timeout=15.0) as client:
             patient_data, conditions_data, medications_data, observations_data = await asyncio.gather(
                 _get(client, f"{base}/Patient/{patient_id}"),
-                _get(client, f"{base}/Condition", {"patient": patient_id, "clinical-status": "active"}),
-                _get(client, f"{base}/MedicationRequest", {"patient": patient_id, "status": "active"}),
+                _get(client, f"{base}/Condition", {"patient": patient_id}),
+                _get(client, f"{base}/MedicationRequest", {"patient": patient_id}),
                 _get(client, f"{base}/Observation", {"patient": patient_id, "_sort": "-date", "_count": "20"}),
             )
     except Exception as exc:
