@@ -42,6 +42,15 @@ jobs:
       - name: Install dependencies
         run: cd backend && pip install -r requirements.txt
 
+      - name: Audit backend dependencies
+        run: pip install pip-audit && cd backend && pip-audit -r requirements.txt
+
+      - name: Audit frontend dependencies
+        run: |
+          cd frontend
+          npm ci --ignore-scripts
+          npm audit --audit-level=high
+
       - name: Run tests
         env:
           TESTING: "true"
